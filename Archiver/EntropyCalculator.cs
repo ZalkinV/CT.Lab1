@@ -119,37 +119,6 @@ namespace Archiver
             return probabilities;
         }
 
-        //private double[,,] CalculateSecondOrderProbabilities()
-        //{
-        //    int bytesCount = this.Bytes.Count;
-        //    int[,,] bytesCounts = new int[BYTES_COUNT, BYTES_COUNT, BYTES_COUNT];
-        //    for (int i = 2; i < bytesCount; i++)
-        //    {
-        //        int byteValue = this.Bytes[i];
-        //        int prevByteValue = this.Bytes[i - 1];
-        //        int pprevByteValue = this.Bytes[i - 2];
-        //        bytesCounts[byteValue, prevByteValue, pprevByteValue]++;
-        //    }
-
-        //    double[,,] probabilities = new double[BYTES_COUNT, BYTES_COUNT, BYTES_COUNT];
-        //    for (int i = 0; i < BYTES_COUNT; i++)
-        //    {
-        //        for (int j = 0; j < BYTES_COUNT; j++)
-        //        {
-        //            int combinationsCount = 0;
-        //            for (int ijc = 0; ijc < BYTES_COUNT; ijc++)
-        //                combinationsCount += bytesCounts[i, j, ijc];
-
-        //            for (int k = 0; k < BYTES_COUNT; k++)
-        //            {
-        //                probabilities[i, j, k] = (double)bytesCounts[i, j, k] / combinationsCount;
-        //            }
-        //        }
-        //    }
-
-        //    return probabilities;
-        //}
-
         private double CalculateZeroOrderEntropy()
         {
             double entropy = 0;
@@ -182,8 +151,9 @@ namespace Archiver
             foreach (var byteProb in this.SecondOrderProbabilities)
             {
                 Comb2 prevBytes = new Comb2(byteProb.Key.Previous, byteProb.Key.PPrevious);
-                double prevByteProb = this.FirstOrderProbabilities[prevBytes];
-                entropy += prevByteProb * byteProb.Value * Math.Log2(byteProb.Value);
+                double pprevByteProb = this.ZeroOrderProbabilities[prevBytes.Previous];
+                double prevBytesProb = this.FirstOrderProbabilities[prevBytes];
+                entropy += pprevByteProb * prevBytesProb * byteProb.Value * Math.Log2(byteProb.Value);
             }
 
             entropy *= -1;
