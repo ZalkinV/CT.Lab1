@@ -21,12 +21,11 @@ namespace Archiver
         {
             this.Bytes = bytes;
             this.ZeroOrderProbabilities = CalculateZeroOrderProbabilities();
-            //this.FirstOrderProbabilities = CalculateFirstOrderProbabilities();
-            var a = CalculateFirstOrderProbabilities();
-            //this.SecondOrderProbabilities = CalculateSecondOrderProbabilities();
+            this.FirstOrderProbabilities = CalculateFirstOrderProbabilities();
+            this.SecondOrderProbabilities = CalculateSecondOrderProbabilities();
             this.ZeroOrderEntropy = CalculateZeroOrderEntropy();
             this.FirstOrderEntropy = CalculateFirstOrderEntropy();
-            //this.SecondOrderEntropy = CalculateSecondOrderEntropy();
+            this.SecondOrderEntropy = CalculateSecondOrderEntropy();
         }
 
         private Dictionary<byte, double> CalculateZeroOrderProbabilities()
@@ -53,7 +52,7 @@ namespace Archiver
         private Dictionary<Comb2, double> CalculateFirstOrderProbabilities()
         {
             int bytesCount = this.Bytes.Count;
-            Dictionary<Comb2, int> bytesCounts = new Dictionary<Comb2, int>(256 * 256);
+            Dictionary<Comb2, int> bytesCounts = new Dictionary<Comb2, int>();
             for (int i = 1; i < bytesCount; i++)
             {
                 Comb2 comb = new Comb2(this.Bytes[i], this.Bytes[i - 1]);
@@ -85,34 +84,40 @@ namespace Archiver
             return probabilities;
         }
 
-        //private double[,] CalculateFirstOrderProbabilities()
-        //{
-        //    int BYTES_COUNT = 256;
-        //    int bytesCount = this.Bytes.Count;
-        //    int[,] bytesCounts = new int[BYTES_COUNT, BYTES_COUNT];
-        //    for (int i = 1; i < bytesCount; i++)
-        //    {
-        //        int byteValue = this.Bytes[i];
-        //        int prevByteValue = this.Bytes[i - 1];
-        //        bytesCounts[byteValue, prevByteValue]++;
-        //    }
+        private Dictionary<Comb3, double> CalculateSecondOrderProbabilities()
+        {
+            int bytesCount = this.Bytes.Count;
+            Dictionary<Comb3, int> bytesCounts = new Dictionary<Comb3, int>();
+            for (int i = 2; i < bytesCount; i++)
+            {
+                Comb3 comb = new Comb3(this.Bytes[i], this.Bytes[i - 1], this.Bytes[i - 2]);
+                if (!bytesCounts.ContainsKey(comb))
+                    bytesCounts[comb] = 0;
+                bytesCounts[comb]++;
+            }
 
 
-        //    double[,] probabilities = new double[BYTES_COUNT, BYTES_COUNT];
-        //    for (int i = 0; i < BYTES_COUNT; i++)
-        //    {
-        //        int combinationsCount = 0;
-        //        for (int ic = 0; ic < BYTES_COUNT; ic++)
-        //            combinationsCount += bytesCounts[i, ic];
+            Dictionary<Comb3, double> probabilities = new Dictionary<Comb3, double>();
+            Dictionary<Comb2, int> prevByteCombinationsCount = new Dictionary<Comb2, int>();
+            foreach (var byteCount in bytesCounts)
+            {
+                Comb2 prevBytes = new Comb2(byteCount.Key.Previous, byteCount.Key.PPrevious);
+                int combinationsCount = 0;
+                if (!prevByteCombinationsCount.ContainsKey(prevBytes))
+                {
+                    combinationsCount = bytesCounts.Where(x => new Comb2(x.Key.Previous, x.Key.PPrevious).Equals(prevBytes)).Sum(x => x.Value);
+                    prevByteCombinationsCount[prevBytes] = combinationsCount;
+                }
+                else
+                {
+                    combinationsCount = prevByteCombinationsCount[prevBytes];
+                }
 
-        //        for (int j = 0; j < BYTES_COUNT; j++)
-        //        {
-        //            probabilities[i, j] = (double)bytesCounts[i, j] / combinationsCount;
-        //        }
-        //    }
+                probabilities[byteCount.Key] = (double)byteCount.Value / combinationsCount;
+            }
 
-        //    return probabilities;
-        //}
+            return probabilities;
+        }
 
         //private double[,,] CalculateSecondOrderProbabilities()
         //{
@@ -163,29 +168,27 @@ namespace Archiver
             foreach (var byteProb in this.FirstOrderProbabilities)
             {
                 double prevByteProb = this.ZeroOrderProbabilities[byteProb.Key.Previous];
-                entropy += prevByteProb * byteProb.Value * Math.Log2(prevByteProb);
+                entropy += prevByteProb * byteProb.Value * Math.Log2(byteProb.Value);
             }
-            //for (int i = 0; i < this.FirstOrderProbabilities.Length; i++)
-            //{
-            //    for (int j = 0; j < this.FirstOrderProbabilities.Length; j++)
-            //    {
-            //        double bytesProb = this.FirstOrderProbabilities[i, j];
-            //        if (bytesProb != 0)
-            //        {
-            //            double prevProb = this.ZeroOrderProbabilities[j];
-            //            entropy += prevProb * bytesProb * Math.Log2(bytesProb);
-            //        }
-            //    }
-
-            //}
+            
             entropy *= -1;
 
             return entropy;
         }
 
-        //private double CalculateSecondOrderEntropy()
-        //{
-        //    return 0;
-        //}
+        private double CalculateSecondOrderEntropy()
+        {
+            double entropy = 0;
+            foreach (var byteProb in this.SecondOrderProbabilities)
+            {
+                Comb2 prevBytes = new Comb2(byteProb.Key.Previous, byteProb.Key.PPrevious);
+                double prevByteProb = this.FirstOrderProbabilities[prevBytes];
+                entropy += prevByteProb * byteProb.Value * Math.Log2(byteProb.Value);
+            }
+
+            entropy *= -1;
+
+            return entropy;
+        }
     }
 }

@@ -46,6 +46,19 @@ namespace Archiver
             this.PPrevious = pPrevious;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Comb3 comb &&
+                   this.Current == comb.Current &&
+                   this.Previous == comb.Previous &&
+                   this.PPrevious == comb.PPrevious;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Current, this.Previous, this.PPrevious);
+        }
+
         public override string ToString()
         {
             return $"{PPrevious} {Previous} {Current}";
