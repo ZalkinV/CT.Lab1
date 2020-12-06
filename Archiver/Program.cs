@@ -15,7 +15,7 @@ namespace Archiver
             {
 
                 if (args.Length == 0)
-                    args = new string[] { "i", "calgarycorpus/book1" };
+                    args = new string[] { "e", "calgarycorpus/test.txt" };
 
                 string mode = args[0];
                 string filename = args[1];
@@ -27,6 +27,8 @@ namespace Archiver
                         CalculateEntropies(bytesFromFile);
                         break;
                     case ENC_MODE:
+                        Encoder encoder = new Encoder(bytesFromFile);
+                        var bwtPairs = encoder.BWT(bytesFromFile);
                         break;
                     case DEC_MODE:
                         break;

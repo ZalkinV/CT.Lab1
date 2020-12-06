@@ -29,5 +29,10 @@ namespace Archiver
         {
             return HashCode.Combine(this.First, this.Last, this.OriginIndex);
         }
+
+        public override string ToString()
+        {
+            return $"{(char)First} {(char)Last} {OriginIndex}";
+        }
     }
 }
