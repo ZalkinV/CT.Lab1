@@ -50,69 +50,69 @@ namespace Archiver
             return probabilities;
         }
 
-        //private Dictionary<Comb2, double> CalculateFirstOrderProbabilities()
-        //{
-        //    int bytesCount = this.Bytes.Count;
-        //    Dictionary<Comb2, int> bytesCounts = new Dictionary<Comb2, int>(256 * 256);
-        //    for (int i = 1; i < bytesCount; i++)
-        //    {
-        //        Comb2 comb = new Comb2(this.Bytes[i], this.Bytes[i - 1]);
-        //        if (!bytesCounts.ContainsKey(comb))
-        //            bytesCounts[comb] = 0;
-        //        bytesCounts[comb]++;
-        //    }
-
-
-        //    Dictionary<Comb2, double> probabilities = new Dictionary<Comb2, double>();
-        //    Dictionary<byte, int> prevByteCombinationsCount = new Dictionary<byte, int>();
-        //    foreach (var byteCount in bytesCounts)
-        //    {
-        //        byte prevByte = byteCount.Key.Previous;
-        //        int combinationsCount = 0;
-        //        if (!prevByteCombinationsCount.ContainsKey(prevByte))
-        //        {
-        //            combinationsCount = bytesCounts.Where(x => x.Key.Previous == prevByte).Sum(x => x.Value);
-        //            prevByteCombinationsCount[prevByte] = combinationsCount;
-        //        }
-        //        else
-        //        {
-        //            combinationsCount = prevByteCombinationsCount[prevByte];
-        //        }
-
-        //        probabilities[byteCount.Key] = (double)byteCount.Value / combinationsCount;
-        //    }
-
-        //    return probabilities;
-        //}
-
-        private double[,] CalculateFirstOrderProbabilities()
+        private Dictionary<Comb2, double> CalculateFirstOrderProbabilities()
         {
-            int BYTES_COUNT = 256;
             int bytesCount = this.Bytes.Count;
-            int[,] bytesCounts = new int[BYTES_COUNT, BYTES_COUNT];
+            Dictionary<Comb2, int> bytesCounts = new Dictionary<Comb2, int>(256 * 256);
             for (int i = 1; i < bytesCount; i++)
             {
-                int byteValue = this.Bytes[i];
-                int prevByteValue = this.Bytes[i - 1];
-                bytesCounts[byteValue, prevByteValue]++;
+                Comb2 comb = new Comb2(this.Bytes[i], this.Bytes[i - 1]);
+                if (!bytesCounts.ContainsKey(comb))
+                    bytesCounts[comb] = 0;
+                bytesCounts[comb]++;
             }
 
 
-            double[,] probabilities = new double[BYTES_COUNT, BYTES_COUNT];
-            for (int i = 0; i < BYTES_COUNT; i++)
+            Dictionary<Comb2, double> probabilities = new Dictionary<Comb2, double>();
+            Dictionary<byte, int> prevByteCombinationsCount = new Dictionary<byte, int>();
+            foreach (var byteCount in bytesCounts)
             {
+                byte prevByte = byteCount.Key.Previous;
                 int combinationsCount = 0;
-                for (int ic = 0; ic < BYTES_COUNT; ic++)
-                    combinationsCount += bytesCounts[i, ic];
-
-                for (int j = 0; j < BYTES_COUNT; j++)
+                if (!prevByteCombinationsCount.ContainsKey(prevByte))
                 {
-                    probabilities[i, j] = (double)bytesCounts[i, j] / combinationsCount;
+                    combinationsCount = bytesCounts.Where(x => x.Key.Previous == prevByte).Sum(x => x.Value);
+                    prevByteCombinationsCount[prevByte] = combinationsCount;
                 }
+                else
+                {
+                    combinationsCount = prevByteCombinationsCount[prevByte];
+                }
+
+                probabilities[byteCount.Key] = (double)byteCount.Value / combinationsCount;
             }
 
             return probabilities;
         }
+
+        //private double[,] CalculateFirstOrderProbabilities()
+        //{
+        //    int BYTES_COUNT = 256;
+        //    int bytesCount = this.Bytes.Count;
+        //    int[,] bytesCounts = new int[BYTES_COUNT, BYTES_COUNT];
+        //    for (int i = 1; i < bytesCount; i++)
+        //    {
+        //        int byteValue = this.Bytes[i];
+        //        int prevByteValue = this.Bytes[i - 1];
+        //        bytesCounts[byteValue, prevByteValue]++;
+        //    }
+
+
+        //    double[,] probabilities = new double[BYTES_COUNT, BYTES_COUNT];
+        //    for (int i = 0; i < BYTES_COUNT; i++)
+        //    {
+        //        int combinationsCount = 0;
+        //        for (int ic = 0; ic < BYTES_COUNT; ic++)
+        //            combinationsCount += bytesCounts[i, ic];
+
+        //        for (int j = 0; j < BYTES_COUNT; j++)
+        //        {
+        //            probabilities[i, j] = (double)bytesCounts[i, j] / combinationsCount;
+        //        }
+        //    }
+
+        //    return probabilities;
+        //}
 
         //private double[,,] CalculateSecondOrderProbabilities()
         //{

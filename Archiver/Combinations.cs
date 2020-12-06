@@ -15,6 +15,18 @@ namespace Archiver
             this.Previous = previous;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Comb2 comb &&
+                   this.Current == comb.Current &&
+                   this.Previous == comb.Previous;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Current, this.Previous);
+        }
+
         public override string ToString()
         {
             return $"{Previous} {Current}";
