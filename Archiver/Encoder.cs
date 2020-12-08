@@ -14,12 +14,12 @@ namespace Archiver
             this.Bytes = bytes;
         }
 
-        public IList<byte> BWT()
+        public BurrowsWheelerResult BWT()
         {
             var bwt = new BurrowsWheelerTransform(this.Bytes);
-            var pairs = bwt.DirectTransform();
-            var lastSymbols = pairs.Select(p => p.Last).ToList();
-            return lastSymbols;
+            var bwtResult = bwt.DirectTransform();
+
+            return bwtResult;
         }
     }
 }

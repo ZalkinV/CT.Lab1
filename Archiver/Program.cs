@@ -13,7 +13,6 @@ namespace Archiver
         {
             try
             {
-
                 if (args.Length == 0)
                     args = new string[] { "e", "calgarycorpus/test.txt" };
 
