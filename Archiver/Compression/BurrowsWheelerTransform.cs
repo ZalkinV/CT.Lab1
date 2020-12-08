@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Archiver
+namespace Archiver.Compression
 {
     public class BurrowsWheelerTransform
     {
@@ -83,7 +83,7 @@ namespace Archiver
             if (indexOfLeft == indexOfRight) return 0;
 
             int byteCompResult = this.Bytes[indexOfLeft].CompareTo(this.Bytes[indexOfRight]);
-            
+
             int newIndexOfLeft = indexOfLeft;
             int newIndexOfRight = indexOfRight;
             while (byteCompResult == 0)
