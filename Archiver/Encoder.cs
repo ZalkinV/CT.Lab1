@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Archiver
@@ -13,10 +14,12 @@ namespace Archiver
             this.Bytes = bytes;
         }
 
-        public FirstLastPair[] BWT(byte[] bytes)
+        public IList<byte> BWT()
         {
-            var unsortedPairs = BurrowsWheelerTransform.GetAllShifts(bytes);
-            return unsortedPairs;
+            var bwt = new BurrowsWheelerTransform(this.Bytes);
+            var pairs = bwt.DirectTransform();
+            var lastSymbols = pairs.Select(p => p.Last).ToList();
+            return lastSymbols;
         }
     }
 }

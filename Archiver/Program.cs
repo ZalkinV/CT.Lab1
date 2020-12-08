@@ -28,7 +28,7 @@ namespace Archiver
                         break;
                     case ENC_MODE:
                         Encoder encoder = new Encoder(bytesFromFile);
-                        var bwtPairs = encoder.BWT(bytesFromFile);
+                        var bwtPairs = encoder.BWT();
                         break;
                     case DEC_MODE:
                         break;

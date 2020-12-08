@@ -4,12 +4,27 @@ using System.Text;
 
 namespace Archiver
 {
-    public static class BurrowsWheelerTransform
+    public class BurrowsWheelerTransform
     {
-        public static FirstLastPair[] GetAllShifts(byte[] bytes)
+        public IList<byte> Bytes { get; }
+
+        public BurrowsWheelerTransform(IList<byte> bytes)
         {
-            int bytesCount = bytes.Length;
-            FirstLastPair[] pairs = new FirstLastPair[bytes.Length];
+            this.Bytes = bytes;
+        }
+
+        public FirstLastPair[] DirectTransform()
+        {
+            var firstLastPairs = GetAllShifts(this.Bytes);
+            this.Sort(firstLastPairs);
+
+            return firstLastPairs;
+        }
+
+        public static FirstLastPair[] GetAllShifts(IList<byte> bytes)
+        {
+            int bytesCount = bytes.Count;
+            FirstLastPair[] pairs = new FirstLastPair[bytesCount];
             for (int i = 0; i < bytesCount; i++)
             {
                 byte curByte = bytes[i];
