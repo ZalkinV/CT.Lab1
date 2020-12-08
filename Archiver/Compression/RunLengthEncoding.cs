@@ -39,5 +39,21 @@ namespace Archiver.Compression
 
             return result;
         }
+
+        public IList<byte> Decode()
+        {
+            int bytesCount = this.Bytes.Count;
+
+            List<byte> result = new List<byte>(bytesCount);
+            for (int i = 0; i < bytesCount; i += 2)
+            {
+                byte symbol = this.Bytes[i];
+                byte symbolCount = this.Bytes[i + 1];
+                for (int j = 0; j < symbolCount; j++)
+                    result.Add(symbol);
+            }
+
+            return result;
+        }
     }
 }
