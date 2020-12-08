@@ -38,6 +38,46 @@ namespace Archiver
             return bwtResult;
         }
 
+        //http://neerc.ifmo.ru/wiki/index.php?title=%D0%9F%D1%80%D0%B5%D0%BE%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%91%D0%B0%D1%80%D1%80%D0%BE%D1%83%D0%B7%D0%B0-%D0%A3%D0%B8%D0%BB%D0%B5%D1%80%D0%B0
+        public IList<byte> InverseTransform(int initialStringIndex)
+        {
+            int countsLength = 256;
+            int bytesCount = this.Bytes.Count;
+            int[] counts = new int[countsLength];
+            for (int i = 0; i < bytesCount; i++)
+            {
+                byte byteCode = this.Bytes[i];
+                counts[byteCode]++;
+            }
+
+            int sum = 0;
+            for (int i = 0; i < countsLength; i++)
+            {
+                sum += counts[i];
+                counts[i] = sum - counts[i];
+            }
+
+            int[] forInvertTransform = new int[bytesCount];
+            for (int i = 0; i < bytesCount; i++)
+            {
+                byte byteCode = this.Bytes[i];
+                int countOfByte = counts[byteCode];
+                forInvertTransform[countOfByte] = i;
+                counts[byteCode]++;
+            }
+
+            byte[] result = new byte[bytesCount];
+            int currentByteIndex = forInvertTransform[initialStringIndex];
+            for (int i = 0; i < bytesCount; i++)
+            {
+                byte byteCode = this.Bytes[currentByteIndex];
+                result[i] = byteCode;
+                currentByteIndex = forInvertTransform[currentByteIndex];
+            }
+
+            return result;
+        }
+
         private int CompareShifts(int indexOfLeft, int indexOfRight)
         {
             if (indexOfLeft == indexOfRight) return 0;
