@@ -91,5 +91,20 @@ namespace Archiver.Compression
 
             return result;
         }
+
+        public void PrintCodes()
+        {
+            var codes = this.Codes
+                .ToDictionary(
+                    c => c.Key,
+                    c => string.Join("", c.Value.Select(b => b ? 1 : 0)))
+                .OrderBy(x => x.Key);
+
+            Console.WriteLine("Huffman tree codes:");
+            foreach (var code in codes)
+            {
+                Console.WriteLine($"{code.Key} {code.Value}");
+            }
+        }
     }
 }
