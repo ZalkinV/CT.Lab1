@@ -47,5 +47,19 @@ namespace Archiver
 
             return rleResult;
         }
+
+        public static HuffmanResult Huffman(IList<byte> bytes)
+        {
+            var huf = new HuffmanEncoder(bytes);
+            huf.Count();
+            huf.BuildCodes();
+            var hufResult = huf.Encode();
+
+            var result = new HuffmanResult(
+                symbolsCount: (byte)huf.Codes.Count,
+                bytesCounts: huf.Counts,
+                bits: hufResult);
+            return result;
+        }
     }
 }
