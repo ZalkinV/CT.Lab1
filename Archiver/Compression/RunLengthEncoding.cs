@@ -36,6 +36,8 @@ namespace Archiver.Compression
                     prevByte = curByte;
                 }
             }
+            result.Add(prevByte);
+            result.Add(byteCounter);
 
             return result;
         }
