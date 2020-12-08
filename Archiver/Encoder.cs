@@ -1,5 +1,6 @@
 ﻿using Archiver.Compression;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +16,21 @@ namespace Archiver
             this.Bytes = bytes;
         }
 
-        public IList<byte> Encode()
+        public byte[] Encode()
         {
             var bwtResult = BWT(this.Bytes);
             var mtfResult = MTF(bwtResult.Bytes);
             var rleResult = RLE(mtfResult);
+            var hufResult = Huffman(rleResult);
 
-            return rleResult;
+            CompressedData compressedData = new CompressedData(
+                bwtInitialStringIndex: bwtResult.InitialStringIndex,
+                hufSymbolsCount: hufResult.SymbolsCount,
+                hufBytesCounts: hufResult.BytesCounts,
+                hufBits: hufResult.Bits);
+            byte[] result = compressedData.ToByteArray();
+            
+            return result;
         }
 
         public static BurrowsWheelerResult BWT(IList<byte> bytes)
