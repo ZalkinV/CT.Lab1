@@ -19,8 +19,9 @@ namespace Archiver
         {
             var bwtResult = BWT(this.Bytes);
             var mtfResult = MTF(bwtResult.Bytes);
+            var rleResult = RLE(mtfResult);
 
-            return mtfResult;
+            return rleResult;
         }
 
         public static BurrowsWheelerResult BWT(IList<byte> bytes)
@@ -37,6 +38,14 @@ namespace Archiver
             var mtfResult = mtf.Transform();
 
             return mtfResult;
+        }
+
+        public static IList<byte> RLE(IList<byte> bytes)
+        {
+            var rle = new RunLengthEncoding(bytes);
+            var rleResult = rle.Encode();
+
+            return rleResult;
         }
     }
 }
