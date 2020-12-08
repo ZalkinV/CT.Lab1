@@ -7,16 +7,16 @@ namespace Archiver.Compression
 {
     public class HuffmanEncoder
     {
-        public IList<byte> Bytes { get; set; }
+        public IList<byte> Bytes { get; }
 
-        public IList<int> Counts { get; set; }
-        public Dictionary<byte, int> Codes { get; set; }
+        public IList<int> Counts { get; }
+        public Dictionary<byte, List<byte>> Codes { get; set; }
 
         public HuffmanEncoder(IList<byte> bytes)
         {
             this.Bytes = bytes;
             this.Counts = new int[256];
-            this.Codes = new Dictionary<byte, int>();
+            this.Codes = new Dictionary<byte, List<byte>>();
         }
 
         public void Count()
@@ -43,12 +43,38 @@ namespace Archiver.Compression
                     nodes.Add(node);
                 }
             }
-            nodes.Sort(CompareNodes);
+
+            while (nodes.Count > 1)
+            {
+                nodes.Sort(CompareNodes);
+                HuffmanNode left = nodes[0];
+                HuffmanNode right = nodes[1];
+
+                AddBitToCode(left, true);
+                AddBitToCode(right, false);
+
+                var mergedNode = HuffmanNode.Merge(left, right);
+
+                nodes.RemoveAt(0);
+                nodes[0] = mergedNode;
+            }
+        }
+
+        private void AddBitToCode(HuffmanNode node, bool isLeft)
+        {
+            byte bitToAdd = (byte)(isLeft ? 0 : 1);
+            foreach (byte symbol in node.Symbols)
+            {
+                if (this.Codes.ContainsKey(symbol))
+                    this.Codes[symbol].Add(bitToAdd);
+                else
+                    this.Codes[symbol] = new List<byte> { bitToAdd };
+            }
         }
 
         public static int CompareNodes(HuffmanNode left, HuffmanNode right)
         {
-            return -left.Count.CompareTo(right.Count);
+            return left.Count.CompareTo(right.Count);
         }
 
         public IList<byte> Encode()
