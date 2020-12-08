@@ -16,17 +16,26 @@ namespace Archiver
 
         public IList<byte> Encode()
         {
-            var bwtResult = this.BWT();
+            var bwtResult = BWT(this.Bytes);
+            var mtfResult = MTF(bwtResult.Bytes);
 
-            return bwtResult.Bytes;
+            return mtfResult;
         }
 
-        public BurrowsWheelerResult BWT()
+        public static BurrowsWheelerResult BWT(IList<byte> bytes)
         {
-            var bwt = new BurrowsWheelerTransform(this.Bytes);
+            var bwt = new BurrowsWheelerTransform(bytes);
             var bwtResult = bwt.DirectTransform();
 
             return bwtResult;
+        }
+
+        public static IList<byte> MTF(IList<byte> bytes)
+        {
+            var mtf = new MoveToFront(bytes);
+            var mtfResult = mtf.Transform();
+
+            return mtfResult;
         }
     }
 }
