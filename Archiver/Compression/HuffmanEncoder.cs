@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,13 +11,13 @@ namespace Archiver.Compression
         public IList<byte> Bytes { get; }
 
         public IList<int> Counts { get; }
-        public Dictionary<byte, List<byte>> Codes { get; set; }
+        public Dictionary<byte, List<bool>> Codes { get; set; }
 
         public HuffmanEncoder(IList<byte> bytes)
         {
             this.Bytes = bytes;
             this.Counts = new int[256];
-            this.Codes = new Dictionary<byte, List<byte>>();
+            this.Codes = new Dictionary<byte, List<bool>>();
         }
 
         public void Count()
@@ -62,13 +63,13 @@ namespace Archiver.Compression
 
         private void AddBitToCode(HuffmanNode node, bool isLeft)
         {
-            byte bitToAdd = (byte)(isLeft ? 0 : 1);
+            bool bitToAdd = !isLeft;
             foreach (byte symbol in node.Symbols)
             {
                 if (this.Codes.ContainsKey(symbol))
                     this.Codes[symbol].Add(bitToAdd);
                 else
-                    this.Codes[symbol] = new List<byte> { bitToAdd };
+                    this.Codes[symbol] = new List<bool> { bitToAdd };
             }
         }
 
@@ -77,9 +78,18 @@ namespace Archiver.Compression
             return left.Count.CompareTo(right.Count);
         }
 
-        public IList<byte> Encode()
+        public BitArray Encode()
         {
-            return this.Bytes;
+            List<bool> bits = new List<bool>();
+            for (int i = 0; i < this.Bytes.Count; i++)
+            {
+                byte curByte = this.Bytes[i];
+                bits.AddRange(this.Codes[curByte]);
+            }
+
+            BitArray result = new BitArray(bits.ToArray());
+
+            return result;
         }
     }
 }
