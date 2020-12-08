@@ -17,7 +17,8 @@ namespace Archiver
         public BurrowsWheelerResult DirectTransform()
         {
             var firstLastPairs = GetAllShifts(this.Bytes);
-            this.Sort(firstLastPairs);
+            var arr = firstLastPairs.Select(p => p.OriginIndex).ToArray();
+            Array.Sort(arr, CompareShifts);
 
             int initialStringIndex = 0;
             byte[] lastSymbols = new byte[firstLastPairs.Count];
@@ -80,6 +81,28 @@ namespace Archiver
 
                 pairs[j + 1] = pairToPut;
             }
+        }
+
+        private int CompareShifts(int indexOfLeft, int indexOfRight)
+        {
+            if (indexOfLeft == indexOfRight) return 0;
+
+            int byteCompResult = this.Bytes[indexOfLeft].CompareTo(this.Bytes[indexOfRight]);
+            
+            int newIndexOfLeft = indexOfLeft;
+            int newIndexOfRight = indexOfRight;
+            while (byteCompResult == 0)
+            {
+                newIndexOfLeft = (newIndexOfLeft + 1) % this.Bytes.Count;
+                newIndexOfRight = (newIndexOfRight + 1) % this.Bytes.Count;
+
+                byteCompResult = this.Bytes[newIndexOfLeft].CompareTo(this.Bytes[newIndexOfRight]);
+                // If all substring chars are equal and comparison doesn't matter
+                if (newIndexOfLeft == indexOfLeft || newIndexOfRight == indexOfRight)
+                    return 0;
+            }
+
+            return byteCompResult;
         }
     }
 }
