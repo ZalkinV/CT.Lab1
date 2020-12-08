@@ -14,6 +14,13 @@ namespace Archiver
             this.Bytes = bytes;
         }
 
+        public IList<byte> Encode()
+        {
+            var bwtResult = this.BWT();
+
+            return bwtResult.Bytes;
+        }
+
         public BurrowsWheelerResult BWT()
         {
             var bwt = new BurrowsWheelerTransform(this.Bytes);
