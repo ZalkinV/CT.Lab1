@@ -10,13 +10,13 @@ namespace Archiver.Compression
     {
         public IList<byte> Bytes { get; }
 
-        public IList<int> Counts { get; }
+        public Dictionary<byte, int> Counts { get; }
         public Dictionary<byte, List<bool>> Codes { get; set; }
 
         public HuffmanEncoder(IList<byte> bytes)
         {
             this.Bytes = bytes;
-            this.Counts = new int[256];
+            this.Counts = new Dictionary<byte, int>();
             this.Codes = new Dictionary<byte, List<bool>>();
         }
 
@@ -26,23 +26,20 @@ namespace Archiver.Compression
             for (int i = 0; i < bytesCount; i++)
             {
                 byte curByte = this.Bytes[i];
-                this.Counts[curByte]++;
+                if (this.Counts.ContainsKey(curByte))
+                    this.Counts[curByte]++;
+                else
+                    this.Counts[curByte] = 1;
             }
         }
 
         public void BuildCodes()
         {
-            int countsLength = this.Counts.Count;
-            List<HuffmanNode> nodes = new List<HuffmanNode>(countsLength);
-            for (int i = 0; i < countsLength; i++)
+            List<HuffmanNode> nodes = new List<HuffmanNode>(this.Counts.Count);
+            foreach (var count in this.Counts)
             {
-                byte curByte = (byte)i;
-                int curCount = this.Counts[i];
-                if (curCount != 0)
-                {
-                    HuffmanNode node = new HuffmanNode(curCount, curByte);
-                    nodes.Add(node);
-                }
+                HuffmanNode node = new HuffmanNode(count.Value, count.Key);
+                nodes.Add(node);
             }
 
             while (nodes.Count > 1)
