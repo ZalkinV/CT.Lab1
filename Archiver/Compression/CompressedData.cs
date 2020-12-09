@@ -57,7 +57,8 @@ namespace Archiver.Compression
                 result.AddRange(BitConverter.GetBytes(byteCount.Value));
             }
 
-            byte[] forBits = new byte[this.HufBits.Count / 8 + 1];
+            int bytesCount = (int)Math.Ceiling((double)this.HufBits.Count / 8);
+            byte[] forBits = new byte[bytesCount];
             this.HufBits.CopyTo(forBits, 0);
             result.AddRange(forBits);
 
