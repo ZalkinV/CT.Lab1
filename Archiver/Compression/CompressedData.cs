@@ -8,13 +8,13 @@ namespace Archiver.Compression
     public class CompressedData
     {
         public int BwtInitialStringIndex { get; }
-        public byte HufSymbolsCount { get; }
+        public int HufSymbolsCount { get; }
         public Dictionary<byte, int> HufBytesCounts { get; set; }
         public BitArray HufBits { get; set; }
 
         public CompressedData(
             int bwtInitialStringIndex,
-            byte hufSymbolsCount,
+            int hufSymbolsCount,
             Dictionary<byte, int> hufBytesCounts,
             BitArray hufBits)
         {
@@ -28,13 +28,13 @@ namespace Archiver.Compression
         {
             int currentByteIndex = 0;
             this.BwtInitialStringIndex = BitConverter.ToInt32(bytes, currentByteIndex); currentByteIndex += 4;
-            this.HufSymbolsCount = bytes[currentByteIndex]; currentByteIndex += 1;
+            this.HufSymbolsCount = BitConverter.ToInt32(bytes, currentByteIndex); currentByteIndex += 4;
 
             Dictionary<byte, int> hufBytesCount = new Dictionary<byte, int>();
             for (int i = 0; i < this.HufSymbolsCount; i++)
             {
                 byte symbol = bytes[currentByteIndex]; currentByteIndex += 1;
-                int symbolsCount = bytes[currentByteIndex]; currentByteIndex += 4;
+                int symbolsCount = BitConverter.ToInt32(bytes, currentByteIndex); currentByteIndex += 4;
                 hufBytesCount[symbol] = symbolsCount;
             }
             this.HufBytesCounts = hufBytesCount;
@@ -50,7 +50,7 @@ namespace Archiver.Compression
             List<byte> result = new List<byte>();
             
             result.AddRange(BitConverter.GetBytes(this.BwtInitialStringIndex));
-            result.Add(this.HufSymbolsCount);
+            result.AddRange(BitConverter.GetBytes(this.HufSymbolsCount));
             foreach (var byteCount in HufBytesCounts)
             {
                 result.Add(byteCount.Key);

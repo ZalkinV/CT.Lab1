@@ -25,7 +25,7 @@ namespace Archiver
 
             CompressedData compressedData = new CompressedData(
                 bwtInitialStringIndex: bwtResult.InitialStringIndex,
-                hufSymbolsCount: (byte)hufResult.BytesCounts.Count,
+                hufSymbolsCount: hufResult.BytesCounts.Count,
                 hufBytesCounts: hufResult.BytesCounts,
                 hufBits: hufResult.Bits);
             byte[] result = compressedData.ToByteArray();
