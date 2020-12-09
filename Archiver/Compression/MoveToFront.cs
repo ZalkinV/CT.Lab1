@@ -16,10 +16,7 @@ namespace Archiver.Compression
         public IList<byte> Transform()
         {
             int bytesCount = this.Bytes.Count;
-            int pileOfBookCount = 256;
-            byte[] pileOfBook = new byte[pileOfBookCount];
-            for (int i = 0; i < pileOfBookCount; i++)
-                pileOfBook[i] = (byte)i;
+            byte[] pileOfBook = GetPileOfBook();
 
             byte[] result = new byte[bytesCount];
             for (int i = 0; i < bytesCount; i++)
@@ -28,12 +25,46 @@ namespace Archiver.Compression
                 byte indexOfByte = (byte)Array.IndexOf(pileOfBook, curByte);
                 result[i] = indexOfByte;
 
-                for (int j = indexOfByte; j > 0; j--)
-                    pileOfBook[j] = pileOfBook[j - 1];
-                pileOfBook[0] = curByte;
+                MoveAllBooks(pileOfBook, curByte, indexOfByte);
             }
 
             return result;
+        }
+
+        public IList<byte> InverseTransform()
+        {
+            int bytesCount = this.Bytes.Count;
+            byte[] pileOfBook = GetPileOfBook();
+
+            byte[] result = new byte[bytesCount];
+            for (int i = 0; i < bytesCount; i++)
+            {
+                byte curByte = this.Bytes[i];
+                byte realByte = pileOfBook[curByte];
+                result[i] = realByte;
+
+                byte indexOfByte = (byte)Array.IndexOf(pileOfBook, realByte);
+                MoveAllBooks(pileOfBook, realByte, indexOfByte);
+            }
+
+            return result;
+        }
+
+        private static void MoveAllBooks(byte[] pileOfBook, byte foundByte, int foundBytePosition)
+        {
+            for (int j = foundBytePosition; j > 0; j--)
+                pileOfBook[j] = pileOfBook[j - 1];
+            pileOfBook[0] = foundByte;
+        }
+
+        private static byte[] GetPileOfBook()
+        {
+            int pileOfBookCount = 256;
+            byte[] pileOfBook = new byte[pileOfBookCount];
+            for (int i = 0; i < pileOfBookCount; i++)
+                pileOfBook[i] = (byte)i;
+
+            return pileOfBook;
         }
     }
 }
