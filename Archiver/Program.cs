@@ -27,11 +27,7 @@ namespace Archiver
                         CalculateEntropies(bytesFromFile);
                         break;
                     case ENC_MODE:
-                        Encoder encoder = new Encoder(bytesFromFile);
-                        byte[] encodedBytes = encoder.Encode();
-
-                        string newFilename = filename + ARCHIVE_EXTENSION;
-                        File.WriteAllBytes(newFilename, encodedBytes);
+                        Encode(filename, bytesFromFile);
                         break;
                     case DEC_MODE:
                         break;
@@ -56,6 +52,17 @@ namespace Archiver
             Console.WriteLine($"0-th order entropy H(X) = {entropyCalculator.ZeroOrderEntropy}");
             Console.WriteLine($"1-th order entropy H(X|X) = {entropyCalculator.FirstOrderEntropy}");
             Console.WriteLine($"2-th order entropy H(X|XX) = {entropyCalculator.SecondOrderEntropy}");
+        }
+
+        public static void Encode(string filename, byte[] bytesFromFile)
+        {
+            Encoder encoder = new Encoder(bytesFromFile);
+            byte[] encodedBytes = encoder.Encode();
+
+            string newFilename = filename + ARCHIVE_EXTENSION;
+            File.WriteAllBytes(newFilename, encodedBytes);
+
+            Console.WriteLine($"File '{filename}' was encrypted as '{newFilename}'");
         }
     }
 }
