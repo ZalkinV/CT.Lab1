@@ -29,6 +29,8 @@ namespace Archiver
                 string path = args[1];
                 string dir = Path.GetDirectoryName(path);
                 string pattern = Path.GetFileName(path);
+                if (dir == string.Empty)
+                    dir = "./";
                 string[] filesNames = Directory.GetFiles(dir, pattern);
 
                 if (filesNames.Length == 0)
@@ -67,7 +69,9 @@ namespace Archiver
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Error: {e.Message}");
+                Console.WriteLine("Press any key to close the app...");
+                Console.ReadLine();
             }
         }
 
