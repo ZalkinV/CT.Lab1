@@ -7,13 +7,11 @@ namespace Archiver.Compression
 {
     public class HuffmanResult
     {
-        public byte SymbolsCount { get; }
         public Dictionary<byte, int> BytesCounts { get; }
         public BitArray Bits { get; }
 
-        public HuffmanResult(byte symbolsCount, Dictionary<byte, int> bytesCounts, BitArray bits)
+        public HuffmanResult(Dictionary<byte, int> bytesCounts, BitArray bits)
         {
-            this.SymbolsCount = symbolsCount;
             this.BytesCounts = bytesCounts;
             this.Bits = bits;
         }

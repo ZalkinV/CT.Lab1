@@ -25,7 +25,7 @@ namespace Archiver
 
             CompressedData compressedData = new CompressedData(
                 bwtInitialStringIndex: bwtResult.InitialStringIndex,
-                hufSymbolsCount: hufResult.SymbolsCount,
+                hufSymbolsCount: (byte)hufResult.BytesCounts.Count,
                 hufBytesCounts: hufResult.BytesCounts,
                 hufBits: hufResult.Bits);
             byte[] result = compressedData.ToByteArray();
@@ -59,13 +59,12 @@ namespace Archiver
 
         public static HuffmanResult Huffman(IList<byte> bytes)
         {
-            var huf = new HuffmanEncoder(bytes);
+            var huf = new Huffman(bytes);
             huf.Count();
             huf.BuildCodes();
             var hufResult = huf.Encode();
 
             var result = new HuffmanResult(
-                symbolsCount: (byte)huf.Codes.Count,
                 bytesCounts: huf.Counts,
                 bits: hufResult);
             return result;
