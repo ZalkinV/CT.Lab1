@@ -1,6 +1,7 @@
 ﻿using Archiver.Compression;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Archiver
@@ -16,7 +17,8 @@ namespace Archiver
 
         public byte[] Decode()
         {
-            return this.Bytes;
+            var result = new CompressedData(this.Bytes.ToArray());
+            return this.Bytes.ToArray();
         }
 
         public IList<byte> BWT(int initialStringIndex)

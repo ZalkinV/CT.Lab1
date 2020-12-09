@@ -24,6 +24,27 @@ namespace Archiver.Compression
             this.HufBits = hufBits;
         }
 
+        public CompressedData(byte[] bytes)
+        {
+            int currentByteIndex = 0;
+            this.BwtInitialStringIndex = BitConverter.ToInt32(bytes, currentByteIndex); currentByteIndex += 4;
+            this.HufSymbolsCount = bytes[currentByteIndex]; currentByteIndex += 1;
+
+            Dictionary<byte, int> hufBytesCount = new Dictionary<byte, int>();
+            for (int i = 0; i < this.HufSymbolsCount; i++)
+            {
+                byte symbol = bytes[currentByteIndex]; currentByteIndex += 1;
+                int symbolsCount = bytes[currentByteIndex]; currentByteIndex += 4;
+                hufBytesCount[symbol] = symbolsCount;
+            }
+            this.HufBytesCounts = hufBytesCount;
+
+            int bytesCountInBits = bytes.Length - currentByteIndex;
+            byte[] forBits = new byte[bytesCountInBits];
+            Array.Copy(bytes, bytesCountInBits, forBits, 0, forBits.Length);
+            this.HufBits = new BitArray(forBits);
+        }
+
         public byte[] ToByteArray()
         {
             List<byte> result = new List<byte>();
