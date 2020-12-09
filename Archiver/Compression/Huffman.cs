@@ -10,23 +10,30 @@ namespace Archiver.Compression
     {
         public Dictionary<byte, int> Counts { get; set; }
         public Dictionary<byte, List<bool>> Codes { get; set; }
+        public Dictionary<string, byte> InverseCodes { get; set; }
 
         public Huffman()
         {
             this.Counts = new Dictionary<byte, int>();
             this.Codes = new Dictionary<byte, List<bool>>();
+            this.InverseCodes = new Dictionary<string, byte>();
         }
 
-        public Huffman(Dictionary<byte, int> counts)
+        public void BuildCodes(Dictionary<byte, int> counts)
         {
             this.Counts = counts;
-            this.Codes = new Dictionary<byte, List<bool>>();
+            BuildCodes();
+
+            foreach (var codeWord in this.Codes)
+            {
+                string code = string.Join("", codeWord.Value.Select(b => b ? 1 : 0));
+                byte value = codeWord.Key;
+                this.InverseCodes.Add(code, value);
+            }
         }
 
-        public void BuildCodes(IList<byte> bytes)
+        public void BuildCodes()
         {
-            this.Counts = CountBytes(bytes);
-
             List<HuffmanNode> nodes = new List<HuffmanNode>(this.Counts.Count);
             foreach (var count in this.Counts)
             {
@@ -50,21 +57,17 @@ namespace Archiver.Compression
             }
         }
 
-        public static Dictionary<byte, int> CountBytes(IList<byte> bytes)
+        public void CountBytes(IList<byte> bytes)
         {
             int bytesCount = bytes.Count;
-
-            Dictionary<byte, int> counts = new Dictionary<byte, int>();
             for (int i = 0; i < bytesCount; i++)
             {
                 byte curByte = bytes[i];
-                if (counts.ContainsKey(curByte))
-                    counts[curByte]++;
+                if (this.Counts.ContainsKey(curByte))
+                    this.Counts[curByte]++;
                 else
-                    counts[curByte] = 1;
+                    this.Counts[curByte] = 1;
             }
-
-            return counts;
         }
 
         private void AddBitToCode(HuffmanNode node, bool isLeft)
@@ -98,10 +101,23 @@ namespace Archiver.Compression
             return result;
         }
 
+        // TODO: Make more effective encoding with tree or something else
         public IList<byte> Decode(BitArray bitArray)
         {
-            
-            return new List<byte>();
+            List<byte> result = new List<byte>();
+            string currentCodeWord = string.Empty;
+            for (int i = 0; i < bitArray.Count; i++)
+            {
+                bool currentBit = bitArray[i];
+                currentCodeWord += currentBit ? "1" : "0";
+
+                if (this.InverseCodes.TryGetValue(currentCodeWord, out byte decodedValue))
+                {
+                    result.Add(decodedValue);
+                    currentCodeWord = string.Empty;
+                }
+            }
+            return result;
         }
 
         public void PrintCodes()

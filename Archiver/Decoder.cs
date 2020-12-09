@@ -29,8 +29,8 @@ namespace Archiver
 
         public static IList<byte> Huffman(HuffmanResult huffmanResult)
         {
-            Huffman huf = new Huffman(huffmanResult.BytesCounts);
-            huf.BuildCodes();
+            Huffman huf = new Huffman();
+            huf.BuildCodes(huffmanResult.BytesCounts);
             var hufResult = huf.Decode(huffmanResult.Bits);
 
 
