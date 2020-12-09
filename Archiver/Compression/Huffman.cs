@@ -6,14 +6,14 @@ using System.Text;
 
 namespace Archiver.Compression
 {
-    public class HuffmanEncoder
+    public class Huffman
     {
         public IList<byte> Bytes { get; }
 
         public Dictionary<byte, int> Counts { get; }
         public Dictionary<byte, List<bool>> Codes { get; set; }
 
-        public HuffmanEncoder(IList<byte> bytes)
+        public Huffman(IList<byte> bytes)
         {
             this.Bytes = bytes;
             this.Counts = new Dictionary<byte, int>();
