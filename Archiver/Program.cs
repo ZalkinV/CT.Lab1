@@ -15,10 +15,6 @@ namespace Archiver
         {
             try
             {
-#if DEBUG
-                args = new string[] { "i", "calgarycorpus/" };
-#endif
-
                 if (args.Length == 0)
                 {
                     args = new string[2];
