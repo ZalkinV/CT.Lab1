@@ -93,12 +93,57 @@ namespace Archiver.Compression
             for (int i = 0; i < bytes.Count; i++)
             {
                 byte curByte = bytes[i];
-                bits.AddRange(this.Codes[curByte]);
+                List<bool> codeBits = this.Codes[curByte];
+                bits.AddRange(codeBits);
+            }
+
+            int remainEmptyBitsCount = 8 - bits.Count % 8;
+            if (remainEmptyBitsCount != 0)
+            {
+                IList<bool> notExistedCode = this.GetNotExistedCode(remainEmptyBitsCount);
+                bits.AddRange(notExistedCode);
             }
 
             BitArray result = new BitArray(bits.ToArray());
 
             return result;
+        }
+
+        // TODO: Bad solution
+        private IList<bool> GetNotExistedCode(int codeWordLength)
+        {
+            List<bool> shortestCode = null;
+            List<bool> existedCode = null;
+            foreach (var codeWord in this.Codes.Values)
+            {
+                if (shortestCode is null || codeWord.Count < shortestCode.Count)
+                    shortestCode = codeWord;
+
+                if (codeWord.Count == codeWordLength)
+                {
+                    existedCode = codeWord;
+                    break;
+                }
+            }
+
+            List<bool> notExistedCode;
+            if (existedCode is null)
+            {
+                bool bitToSet = true;
+                if (shortestCode.Count == 1)
+                    bitToSet = !shortestCode[0];
+
+                notExistedCode = new List<bool>(codeWordLength);
+                for (int i = 0; i < codeWordLength; i++)
+                    notExistedCode[i] = bitToSet;
+            }
+            else
+            {
+                notExistedCode = new List<bool>(existedCode);
+                notExistedCode[notExistedCode.Count - 1] = !existedCode[notExistedCode.Count - 1];
+            }
+
+            return notExistedCode;
         }
 
         // TODO: Make more effective encoding with tree or something else
