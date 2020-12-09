@@ -73,7 +73,7 @@ namespace Archiver.Compression
             foreach (byte symbol in node.Symbols)
             {
                 if (this.Codes.ContainsKey(symbol))
-                    this.Codes[symbol].Add(bitToAdd);
+                    this.Codes[symbol].Insert(0, bitToAdd);
                 else
                     this.Codes[symbol] = new List<bool> { bitToAdd };
             }
