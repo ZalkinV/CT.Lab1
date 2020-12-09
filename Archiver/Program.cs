@@ -15,30 +15,43 @@ namespace Archiver
             try
             {
                 if (args.Length == 0)
-                    args = new string[] { "e", "calgarycorpus/test.txt" };
+                    args = new string[] { "i", "calgarycorpus/*" };
 
                 string mode = args[0];
-                string filename = args[1];
-                
-                byte[] bytesFromFile = File.ReadAllBytes(filename);
-                switch (mode)
+                string path = args[1];
+                string dir = Path.GetDirectoryName(path);
+                string pattern = Path.GetFileName(path);
+                string[] filesNames = Directory.GetFiles(dir, pattern);
+
+                foreach (string filename in filesNames)
                 {
-                    case INF_MODE:
-                        CalculateEntropies(bytesFromFile);
-                        break;
-                    case ENC_MODE:
-                        Encode(filename, bytesFromFile);
-                        break;
-                    case DEC_MODE:
-                        Decode(filename, bytesFromFile);
-                        break;
-                    default:
-                        Console.WriteLine(
-                            $"Unknown mode '{mode}' was selected, try one of the following:\n" +
-                            $"{INF_MODE} — info mode\n" +
-                            $"{ENC_MODE} — encoding mode\n" +
-                            $"{DEC_MODE} — decoding mode\n");
-                        break;
+                    byte[] bytesFromFile = File.ReadAllBytes(filename);
+                    switch (mode)
+                    {
+                        case INF_MODE:
+                            CalculateEntropies(filename, bytesFromFile);
+                            break;
+                        case ENC_MODE:
+                            Encode(path, bytesFromFile);
+                            break;
+                        case DEC_MODE:
+                            try
+                            {
+                                Decode(path, bytesFromFile);
+                            }
+                            catch (ArgumentException e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                            break;
+                        default:
+                            Console.WriteLine(
+                                $"Unknown mode '{mode}' was selected, try one of the following:\n" +
+                                $"{INF_MODE} — info mode\n" +
+                                $"{ENC_MODE} — encoding mode\n" +
+                                $"{DEC_MODE} — decoding mode\n");
+                            break;
+                    }
                 }
             }
             catch (Exception e)
@@ -47,12 +60,14 @@ namespace Archiver
             }
         }
 
-        public static void CalculateEntropies(byte[] bytesFromFile)
+        public static void CalculateEntropies(string filename, byte[] bytesFromFile)
         {
+            Console.WriteLine($"Entropies for '{filename}':");
             EntropyCalculator entropyCalculator = new EntropyCalculator(bytesFromFile);
-            Console.WriteLine($"0-th order entropy H(X) = {entropyCalculator.ZeroOrderEntropy}");
-            Console.WriteLine($"1-th order entropy H(X|X) = {entropyCalculator.FirstOrderEntropy}");
-            Console.WriteLine($"2-th order entropy H(X|XX) = {entropyCalculator.SecondOrderEntropy}");
+            Console.WriteLine($"H(X) = {entropyCalculator.ZeroOrderEntropy}");
+            Console.WriteLine($"H(X|X) = {entropyCalculator.FirstOrderEntropy}");
+            Console.WriteLine($"H(X|XX) = {entropyCalculator.SecondOrderEntropy}");
+            Console.WriteLine();
         }
 
         public static void Encode(string filename, byte[] bytesFromFile)
