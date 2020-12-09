@@ -143,5 +143,13 @@ namespace Archiver.Compression
                 Console.WriteLine($"{code.Key} {code.Value}");
             }
         }
+
+        public void PrintCounts()
+        {
+            foreach (var count in this.Counts)
+            {
+                Console.WriteLine($"{count.Key} {count.Value}");
+            }
+        }
     }
 }
