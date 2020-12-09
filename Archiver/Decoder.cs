@@ -17,13 +17,29 @@ namespace Archiver
 
         public byte[] Decode()
         {
-            var result = new CompressedData(this.Bytes.ToArray());
+            var compressedData = new CompressedData(this.Bytes.ToArray());
+            var huffmanResult = new HuffmanResult(
+                bytesCounts: compressedData.HufBytesCounts,
+                bits: compressedData.HufBits);
+            
+            var hufResult = Huffman(huffmanResult);
+
             return this.Bytes.ToArray();
         }
 
-        public IList<byte> BWT(int initialStringIndex)
+        public static IList<byte> Huffman(HuffmanResult huffmanResult)
         {
-            var bwt = new BurrowsWheelerTransform(this.Bytes);
+            Huffman huf = new Huffman(huffmanResult.BytesCounts);
+            huf.BuildCodes();
+            var hufResult = huf.Decode(huffmanResult.Bits);
+
+
+            return hufResult;
+        }
+
+        public static IList<byte> BWT(int initialStringIndex, IList<byte> bytes)
+        {
+            var bwt = new BurrowsWheelerTransform(bytes);
             var reversedBytes = bwt.InverseTransform(initialStringIndex);
 
             return reversedBytes;

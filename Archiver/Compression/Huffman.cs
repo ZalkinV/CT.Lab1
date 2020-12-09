@@ -20,6 +20,12 @@ namespace Archiver.Compression
             this.Codes = new Dictionary<byte, List<bool>>();
         }
 
+        public Huffman(Dictionary<byte, int> counts)
+        {
+            this.Counts = counts;
+            this.Codes = new Dictionary<byte, List<bool>>();
+        }
+
         public void Count()
         {
             int bytesCount = this.Bytes.Count;
@@ -87,6 +93,11 @@ namespace Archiver.Compression
             BitArray result = new BitArray(bits.ToArray());
 
             return result;
+        }
+
+        public IList<byte> Decode(BitArray bitArray)
+        {
+            return new List<byte>();
         }
 
         public void PrintCodes()
