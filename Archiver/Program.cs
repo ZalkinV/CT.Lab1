@@ -8,6 +8,7 @@ namespace Archiver
         private const string INF_MODE = "i";
         private const string ENC_MODE = "e";
         private const string DEC_MODE = "d";
+        private const string ARCHIVE_EXTENSION = ".zva";
 
         static void Main(string[] args)
         {
@@ -18,7 +19,7 @@ namespace Archiver
 
                 string mode = args[0];
                 string filename = args[1];
-
+                
                 byte[] bytesFromFile = File.ReadAllBytes(filename);
                 switch (mode)
                 {
@@ -27,7 +28,10 @@ namespace Archiver
                         break;
                     case ENC_MODE:
                         Encoder encoder = new Encoder(bytesFromFile);
-                        var encodedBytes = encoder.Encode();
+                        byte[] encodedBytes = encoder.Encode();
+
+                        string newFilename = filename + ARCHIVE_EXTENSION;
+                        File.WriteAllBytes(newFilename, encodedBytes);
                         break;
                     case DEC_MODE:
                         break;
