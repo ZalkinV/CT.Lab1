@@ -18,10 +18,11 @@ namespace Archiver
 
         public byte[] Encode()
         {
-            var bwtResult = BWT(this.Bytes);
+            var rleResult1 = RLE(this.Bytes);
+            var bwtResult = BWT(rleResult1);
             var mtfResult = MTF(bwtResult.Bytes);
-            var rleResult = RLE(mtfResult);
-            var hufResult = Huffman(rleResult);
+            var rleResult2 = RLE(mtfResult);
+            var hufResult = Huffman(rleResult2);
 
             CompressedData compressedData = new CompressedData(
                 bwtInitialStringIndex: bwtResult.InitialStringIndex,

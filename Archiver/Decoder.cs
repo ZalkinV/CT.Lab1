@@ -23,11 +23,12 @@ namespace Archiver
                 bits: compressedData.HufBits);
             
             var hufResult = Huffman(huffmanResult);
-            var rleResult = RLE(hufResult);
-            var mtfResult = MTF(rleResult);
+            var rleResult1 = RLE(hufResult);
+            var mtfResult = MTF(rleResult1);
             var bwtResult = BWT(mtfResult, compressedData.BwtInitialStringIndex);
+            var rleResult2 = RLE(bwtResult);
 
-            return bwtResult.ToArray();
+            return rleResult2.ToArray();
         }
 
         public static IList<byte> Huffman(HuffmanResult huffmanResult)
