@@ -41,7 +41,7 @@ namespace Archiver.Compression
 
             int bytesCountInBits = bytes.Length - currentByteIndex;
             byte[] forBits = new byte[bytesCountInBits];
-            Array.Copy(bytes, bytesCountInBits, forBits, 0, forBits.Length);
+            Array.Copy(bytes, currentByteIndex, forBits, 0, forBits.Length);
             this.HufBits = new BitArray(forBits);
         }
 
