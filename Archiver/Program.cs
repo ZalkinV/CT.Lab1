@@ -35,6 +35,9 @@ namespace Archiver
                 string pattern = Path.GetFileName(path);
                 string[] filesNames = Directory.GetFiles(dir, pattern);
 
+                if (filesNames.Length == 0)
+                    throw new ArgumentException($"No such files was found!");
+
                 foreach (string filename in filesNames)
                 {
                     byte[] bytesFromFile = File.ReadAllBytes(filename);
