@@ -30,6 +30,7 @@ namespace Archiver
                         Encode(filename, bytesFromFile);
                         break;
                     case DEC_MODE:
+                        Decode(filename, bytesFromFile);
                         break;
                     default:
                         Console.WriteLine(
@@ -62,7 +63,21 @@ namespace Archiver
             string newFilename = filename + ARCHIVE_EXTENSION;
             File.WriteAllBytes(newFilename, encodedBytes);
 
-            Console.WriteLine($"File '{filename}' was encrypted as '{newFilename}'");
+            Console.WriteLine($"File '{filename}' was encoded as '{newFilename}'");
+        }
+
+        public static void Decode(string filename, byte[] bytesFromFile)
+        {
+            if (!filename.EndsWith(ARCHIVE_EXTENSION))
+                throw new ArgumentException($"Cannot decode files without '{ARCHIVE_EXTENSION}' extension!");
+
+            Decoder decoder = new Decoder(bytesFromFile);
+            byte[] decodedBytes = decoder.Decode();
+            
+            string newFilename = Path.GetFileNameWithoutExtension(filename);
+            File.WriteAllBytes(newFilename, decodedBytes);
+
+            Console.WriteLine($"File '{filename}' was decoded as '{newFilename}'");
         }
     }
 }

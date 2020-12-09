@@ -14,7 +14,7 @@ namespace Archiver
             this.Bytes = bytes;
         }
 
-        public IList<byte> Decode()
+        public byte[] Decode()
         {
             return this.Bytes;
         }
