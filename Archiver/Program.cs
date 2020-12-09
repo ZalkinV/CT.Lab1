@@ -73,11 +73,13 @@ namespace Archiver
 
         public static void CalculateEntropies(string filename, byte[] bytesFromFile)
         {
+            string PrepareDouble(double value) => Math.Round(value, 3).ToString("F3");
+
             Console.WriteLine($"Entropies for '{filename}':");
             EntropyCalculator entropyCalculator = new EntropyCalculator(bytesFromFile);
-            Console.WriteLine($"H(X) = {entropyCalculator.ZeroOrderEntropy}");
-            Console.WriteLine($"H(X|X) = {entropyCalculator.FirstOrderEntropy}");
-            Console.WriteLine($"H(X|XX) = {entropyCalculator.SecondOrderEntropy}");
+            Console.WriteLine($"H(X) = {PrepareDouble(entropyCalculator.ZeroOrderEntropy)}");
+            Console.WriteLine($"H(X|X) = {PrepareDouble(entropyCalculator.FirstOrderEntropy)}");
+            Console.WriteLine($"H(X|XX) = {PrepareDouble(entropyCalculator.SecondOrderEntropy)}");
             Console.WriteLine();
         }
 
