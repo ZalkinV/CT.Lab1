@@ -24,8 +24,10 @@ namespace Archiver
             
             var hufResult = Huffman(huffmanResult);
             var rleResult = RLE(hufResult);
+            var mtfResult = MTF(rleResult);
+            var bwtResult = BWT(mtfResult, compressedData.BwtInitialStringIndex);
 
-            return this.Bytes.ToArray();
+            return bwtResult.ToArray();
         }
 
         public static IList<byte> Huffman(HuffmanResult huffmanResult)
@@ -45,7 +47,15 @@ namespace Archiver
             return rleResult;
         }
 
-        public static IList<byte> BWT(int initialStringIndex, IList<byte> bytes)
+        public static IList<byte> MTF(IList<byte> bytes)
+        {
+            var mtf = new MoveToFront(bytes);
+            var mtfResult = mtf.InverseTransform();
+
+            return mtfResult;
+        }
+
+        public static IList<byte> BWT(IList<byte> bytes, int initialStringIndex)
         {
             var bwt = new BurrowsWheelerTransform(bytes);
             var reversedBytes = bwt.InverseTransform(initialStringIndex);
