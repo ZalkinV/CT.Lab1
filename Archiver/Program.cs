@@ -43,12 +43,12 @@ namespace Archiver
                             CalculateEntropies(filename, bytesFromFile);
                             break;
                         case ENC_MODE:
-                            Encode(path, bytesFromFile);
+                            Encode(filename, bytesFromFile);
                             break;
                         case DEC_MODE:
                             try
                             {
-                                Decode(path, bytesFromFile);
+                                Decode(filename, bytesFromFile);
                             }
                             catch (ArgumentException e)
                             {
