@@ -8,14 +8,11 @@ namespace Archiver.Compression
 {
     public class Huffman
     {
-        public IList<byte> Bytes { get; }
-
-        public Dictionary<byte, int> Counts { get; }
+        public Dictionary<byte, int> Counts { get; set; }
         public Dictionary<byte, List<bool>> Codes { get; set; }
 
-        public Huffman(IList<byte> bytes)
+        public Huffman()
         {
-            this.Bytes = bytes;
             this.Counts = new Dictionary<byte, int>();
             this.Codes = new Dictionary<byte, List<bool>>();
         }
@@ -26,21 +23,10 @@ namespace Archiver.Compression
             this.Codes = new Dictionary<byte, List<bool>>();
         }
 
-        public void Count()
+        public void BuildCodes(IList<byte> bytes)
         {
-            int bytesCount = this.Bytes.Count;
-            for (int i = 0; i < bytesCount; i++)
-            {
-                byte curByte = this.Bytes[i];
-                if (this.Counts.ContainsKey(curByte))
-                    this.Counts[curByte]++;
-                else
-                    this.Counts[curByte] = 1;
-            }
-        }
+            this.Counts = CountBytes(bytes);
 
-        public void BuildCodes()
-        {
             List<HuffmanNode> nodes = new List<HuffmanNode>(this.Counts.Count);
             foreach (var count in this.Counts)
             {
@@ -64,6 +50,23 @@ namespace Archiver.Compression
             }
         }
 
+        public static Dictionary<byte, int> CountBytes(IList<byte> bytes)
+        {
+            int bytesCount = bytes.Count;
+
+            Dictionary<byte, int> counts = new Dictionary<byte, int>();
+            for (int i = 0; i < bytesCount; i++)
+            {
+                byte curByte = bytes[i];
+                if (counts.ContainsKey(curByte))
+                    counts[curByte]++;
+                else
+                    counts[curByte] = 1;
+            }
+
+            return counts;
+        }
+
         private void AddBitToCode(HuffmanNode node, bool isLeft)
         {
             bool bitToAdd = !isLeft;
@@ -81,12 +84,12 @@ namespace Archiver.Compression
             return left.Count.CompareTo(right.Count);
         }
 
-        public BitArray Encode()
+        public BitArray Encode(IList<byte> bytes)
         {
             List<bool> bits = new List<bool>();
-            for (int i = 0; i < this.Bytes.Count; i++)
+            for (int i = 0; i < bytes.Count; i++)
             {
-                byte curByte = this.Bytes[i];
+                byte curByte = bytes[i];
                 bits.AddRange(this.Codes[curByte]);
             }
 
@@ -97,6 +100,7 @@ namespace Archiver.Compression
 
         public IList<byte> Decode(BitArray bitArray)
         {
+            
             return new List<byte>();
         }
 

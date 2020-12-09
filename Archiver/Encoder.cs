@@ -59,10 +59,9 @@ namespace Archiver
 
         public static HuffmanResult Huffman(IList<byte> bytes)
         {
-            var huf = new Huffman(bytes);
-            huf.Count();
-            huf.BuildCodes();
-            var hufResult = huf.Encode();
+            var huf = new Huffman();
+            huf.BuildCodes(bytes);
+            var hufResult = huf.Encode(bytes);
 
             var result = new HuffmanResult(
                 bytesCounts: huf.Counts,
