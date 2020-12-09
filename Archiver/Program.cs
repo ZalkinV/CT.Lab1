@@ -121,7 +121,7 @@ namespace Archiver
             Decoder decoder = new Decoder(bytesFromFile);
             byte[] decodedBytes = decoder.Decode();
             
-            string newFilename = Path.GetFileNameWithoutExtension(filename);
+            string newFilename = filename.Remove(filename.LastIndexOf("."));
             File.WriteAllBytes(newFilename, decodedBytes);
             stopwatch.Stop();
 
