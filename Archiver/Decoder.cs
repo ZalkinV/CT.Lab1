@@ -23,18 +23,26 @@ namespace Archiver
                 bits: compressedData.HufBits);
             
             var hufResult = Huffman(huffmanResult);
+            var rleResult = RLE(hufResult);
 
             return this.Bytes.ToArray();
         }
 
         public static IList<byte> Huffman(HuffmanResult huffmanResult)
         {
-            Huffman huf = new Huffman();
+            var huf = new Huffman();
             huf.BuildCodes(huffmanResult.BytesCounts);
             var hufResult = huf.Decode(huffmanResult.Bits);
 
-
             return hufResult;
+        }
+
+        public static IList<byte> RLE(IList<byte> bytes)
+        {
+            var rle = new RunLengthEncoding(bytes);
+            var rleResult = rle.Decode();
+
+            return rleResult;
         }
 
         public static IList<byte> BWT(int initialStringIndex, IList<byte> bytes)
