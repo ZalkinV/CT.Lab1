@@ -14,9 +14,20 @@ namespace Archiver
         {
             try
             {
-                if (args.Length == 0)
-                    args = new string[] { "i", "calgarycorpus/*" };
+#if DEBUG
+                args = new string[] { "i", "calgarycorpus/" };
+#endif
 
+                if (args.Length == 0)
+                {
+                    args = new string[2];
+                    Console.Write("Select mode: ");
+                    args[0] = Console.ReadLine();
+                    Console.Write("Select path: ");
+                    args[1] = Console.ReadLine();
+                    Console.WriteLine();
+                }
+                
                 string mode = args[0];
                 string path = args[1];
                 string dir = Path.GetDirectoryName(path);
