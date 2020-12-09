@@ -86,7 +86,7 @@ namespace Archiver
 
         public static void Encode(string filename, byte[] bytesFromFile)
         {
-            Console.WriteLine($"Start encoding {filename}...");
+            Console.Write($"{filename}->");
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -97,10 +97,13 @@ namespace Archiver
             File.WriteAllBytes(newFilename, encodedBytes);
             stopwatch.Stop();
 
+            double compressionRate = 1 - (double)encodedBytes.Length / bytesFromFile.Length;
+
             Console.WriteLine(
-                $"File '{filename}' " +
-                $"was encoded as '{newFilename}' " +
-                $"for {stopwatch.Elapsed.TotalSeconds}s");
+                $"{newFilename} " +
+                $"{bytesFromFile.Length}->{encodedBytes.Length} " +
+                $"{compressionRate:P2} " +
+                $"{stopwatch.Elapsed.TotalSeconds}s");
         }
 
         public static void Decode(string filename, byte[] bytesFromFile)
@@ -108,7 +111,7 @@ namespace Archiver
             if (!filename.EndsWith(ARCHIVE_EXTENSION))
                 throw new ArgumentException($"Cannot decode files without '{ARCHIVE_EXTENSION}' extension!");
 
-            Console.WriteLine($"Start decoding {filename}...");
+            Console.Write($"{filename}->");
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -119,9 +122,9 @@ namespace Archiver
             File.WriteAllBytes(newFilename, decodedBytes);
             stopwatch.Stop();
 
-            Console.WriteLine($"File '{filename}' " +
-                $"was decoded as '{newFilename}' " +
-                $"for {stopwatch.Elapsed.TotalSeconds}s");
+            Console.WriteLine(
+                $"{newFilename} " +
+                $"{stopwatch.Elapsed.TotalSeconds}s");
         }
     }
 }
