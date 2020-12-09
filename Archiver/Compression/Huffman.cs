@@ -8,15 +8,17 @@ namespace Archiver.Compression
 {
     public class Huffman
     {
+        private const int EOF_CODE = 257;
+
         public Dictionary<byte, int> Counts { get; set; }
-        public Dictionary<byte, List<bool>> Codes { get; set; }
-        public Dictionary<string, byte> InverseCodes { get; set; }
+        public Dictionary<int, List<bool>> Codes { get; set; }
+        public Dictionary<string, int> InverseCodes { get; set; }
 
         public Huffman()
         {
             this.Counts = new Dictionary<byte, int>();
-            this.Codes = new Dictionary<byte, List<bool>>();
-            this.InverseCodes = new Dictionary<string, byte>();
+            this.Codes = new Dictionary<int, List<bool>>();
+            this.InverseCodes = new Dictionary<string, int>();
         }
 
         public void BuildCodes(Dictionary<byte, int> counts)
@@ -27,7 +29,7 @@ namespace Archiver.Compression
             foreach (var codeWord in this.Codes)
             {
                 string code = string.Join("", codeWord.Value.Select(b => b ? 1 : 0));
-                byte value = codeWord.Key;
+                int value = codeWord.Key;
                 this.InverseCodes.Add(code, value);
             }
         }
@@ -40,6 +42,8 @@ namespace Archiver.Compression
                 HuffmanNode node = new HuffmanNode(count.Value, count.Key);
                 nodes.Add(node);
             }
+            HuffmanNode eofNode = new HuffmanNode(1, EOF_CODE);
+            nodes.Add(eofNode);
 
             while (nodes.Count > 1)
             {
@@ -73,7 +77,7 @@ namespace Archiver.Compression
         private void AddBitToCode(HuffmanNode node, bool isLeft)
         {
             bool bitToAdd = !isLeft;
-            foreach (byte symbol in node.Symbols)
+            foreach (int symbol in node.Symbols)
             {
                 if (this.Codes.ContainsKey(symbol))
                     this.Codes[symbol].Insert(0, bitToAdd);
@@ -96,54 +100,11 @@ namespace Archiver.Compression
                 List<bool> codeBits = this.Codes[curByte];
                 bits.AddRange(codeBits);
             }
-
-            int remainEmptyBitsCount = 8 - bits.Count % 8;
-            if (remainEmptyBitsCount != 0)
-            {
-                IList<bool> notExistedCode = this.GetNotExistedCode(remainEmptyBitsCount);
-                bits.AddRange(notExistedCode);
-            }
+            bits.AddRange(this.Codes[EOF_CODE]);
 
             BitArray result = new BitArray(bits.ToArray());
 
             return result;
-        }
-
-        // TODO: Bad solution
-        private IList<bool> GetNotExistedCode(int codeWordLength)
-        {
-            List<bool> shortestCode = null;
-            List<bool> existedCode = null;
-            foreach (var codeWord in this.Codes.Values)
-            {
-                if (shortestCode is null || codeWord.Count < shortestCode.Count)
-                    shortestCode = codeWord;
-
-                if (codeWord.Count == codeWordLength)
-                {
-                    existedCode = codeWord;
-                    break;
-                }
-            }
-
-            List<bool> notExistedCode;
-            if (existedCode is null)
-            {
-                bool bitToSet = true;
-                if (shortestCode.Count == 1)
-                    bitToSet = !shortestCode[0];
-
-                notExistedCode = new List<bool>(codeWordLength);
-                for (int i = 0; i < codeWordLength; i++)
-                    notExistedCode[i] = bitToSet;
-            }
-            else
-            {
-                notExistedCode = new List<bool>(existedCode);
-                notExistedCode[notExistedCode.Count - 1] = !existedCode[notExistedCode.Count - 1];
-            }
-
-            return notExistedCode;
         }
 
         // TODO: Make more effective encoding with tree or something else
@@ -156,9 +117,12 @@ namespace Archiver.Compression
                 bool currentBit = bitArray[i];
                 currentCodeWord += currentBit ? "1" : "0";
 
-                if (this.InverseCodes.TryGetValue(currentCodeWord, out byte decodedValue))
+                if (this.InverseCodes.TryGetValue(currentCodeWord, out int decodedValue))
                 {
-                    result.Add(decodedValue);
+                    if (decodedValue == EOF_CODE)
+                        break;
+
+                    result.Add((byte)decodedValue);
                     currentCodeWord = string.Empty;
                 }
             }

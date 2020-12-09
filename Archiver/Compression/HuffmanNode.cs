@@ -7,18 +7,18 @@ namespace Archiver.Compression
     public class HuffmanNode
     {
         public int Count { get; set; }
-        public byte[] Symbols { get; set; }
+        public int[] Symbols { get; set; }
 
-        public HuffmanNode(int count, byte[] symbols)
+        public HuffmanNode(int count, int[] symbols)
         {
             this.Count = count;
             this.Symbols = symbols;
         }
 
-        public HuffmanNode(int count, byte symbol)
+        public HuffmanNode(int count, int symbol)
             : this(
                   count: count,
-                  symbols: new byte[] { symbol })
+                  symbols: new int[] { symbol })
         {
 
         }
@@ -26,7 +26,7 @@ namespace Archiver.Compression
         public static HuffmanNode Merge(HuffmanNode left, HuffmanNode right)
         {
             int sumCount = left.Count + right.Count;
-            byte[] bytes = new byte[left.Symbols.Length + right.Symbols.Length];
+            int[] bytes = new int[left.Symbols.Length + right.Symbols.Length];
             Array.Copy(left.Symbols, bytes, left.Symbols.Length);
             Array.Copy(right.Symbols, 0, bytes, left.Symbols.Length, right.Symbols.Length);
 
