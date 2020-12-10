@@ -101,11 +101,13 @@ namespace Archiver
             stopwatch.Stop();
 
             double compressionRate = 1 - (double)encodedBytes.Length / bytesFromFile.Length;
+            double averageBitsPerSymbol = ((double)encodedBytes.Length / bytesFromFile.Length) * 8;
 
             Console.WriteLine(
                 $"{newFilename} " +
                 $"{bytesFromFile.Length}->{encodedBytes.Length} " +
                 $"{compressionRate:P2} " +
+                $"{averageBitsPerSymbol} bits " +
                 $"{stopwatch.Elapsed.TotalSeconds}s");
         }
 
