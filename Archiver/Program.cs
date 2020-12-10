@@ -107,7 +107,7 @@ namespace Archiver
                 $"{newFilename} " +
                 $"{bytesFromFile.Length}->{encodedBytes.Length} " +
                 $"{compressionRate:P2} " +
-                $"{averageBitsPerSymbol} bits " +
+                $"{averageBitsPerSymbol:F3} bits " +
                 $"{stopwatch.Elapsed.TotalSeconds}s");
         }
 
@@ -129,6 +129,7 @@ namespace Archiver
 
             Console.WriteLine(
                 $"{newFilename} " +
+                $"{bytesFromFile.Length}->{decodedBytes.Length} " +
                 $"{stopwatch.Elapsed.TotalSeconds}s");
         }
     }
