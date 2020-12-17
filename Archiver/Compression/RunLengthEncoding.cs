@@ -18,26 +18,36 @@ namespace Archiver.Compression
             int bytesCount = this.Bytes.Count;
 
             List<byte> result = new List<byte>(bytesCount);
-            byte prevByte = this.Bytes[0];
-            byte byteCounter = 0;
+            byte runLengthByte = this.Bytes[0];
+            int byteCounter = 0;
             for (int i = 0; i < bytesCount; i++)
             {
                 byte curByte = this.Bytes[i];
-                if (curByte == prevByte && byteCounter < 255)
+                if (curByte == runLengthByte)
                 {
                     byteCounter++;
                 }
                 else
                 {
-                    result.Add(prevByte);
-                    result.Add(byteCounter);
+                    if (byteCounter >= 2)
+                        result.Add((byte)(byteCounter - 2));
 
                     byteCounter = 1;
-                    prevByte = curByte;
+                    runLengthByte = curByte;
+                }
+
+                if (byteCounter <= 2)
+                {
+                    result.Add(runLengthByte);
+                }
+                else if (byteCounter >= 5)
+                {
+                    result.Add((byte)(byteCounter - 2));
+                    byteCounter = 0;
                 }
             }
-            result.Add(prevByte);
-            result.Add(byteCounter);
+            if (byteCounter >= 2)
+                result.Add((byte)(byteCounter - 2));
 
             return result;
         }
