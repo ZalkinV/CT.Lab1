@@ -57,12 +57,24 @@ namespace Archiver.Compression
             int bytesCount = this.Bytes.Count;
 
             List<byte> result = new List<byte>(bytesCount);
-            for (int i = 0; i < bytesCount; i += 2)
+            byte? prevSymbol = null;
+            int i = 0;
+            while (i < bytesCount)
             {
-                byte symbol = this.Bytes[i];
-                byte symbolCount = this.Bytes[i + 1];
-                for (int j = 0; j < symbolCount; j++)
-                    result.Add(symbol);
+                byte curSymbol = this.Bytes[i];
+                if (curSymbol == prevSymbol)
+                {
+                    i++;
+                    int symbolsCount = this.Bytes[i] + 1;
+                    for (int j = 0; j < symbolsCount; j++)
+                        result.Add(curSymbol);
+                }
+                else
+                {
+                    result.Add(curSymbol);
+                    prevSymbol = curSymbol;
+                }
+                i++;
             }
 
             return result;
