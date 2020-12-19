@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archiver", "Archiver\Archiver.csproj", "{9E8A72A9-C614-416A-A676-9AAD4C01E080}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Archiver", "Archiver\Archiver.csproj", "{9E8A72A9-C614-416A-A676-9AAD4C01E080}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JpegCompression", "JpegCompression\JpegCompression.csproj", "{8143F8A1-ABD6-4882-8828-30D7B10C92DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9E8A72A9-C614-416A-A676-9AAD4C01E080}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E8A72A9-C614-416A-A676-9AAD4C01E080}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E8A72A9-C614-416A-A676-9AAD4C01E080}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8143F8A1-ABD6-4882-8828-30D7B10C92DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8143F8A1-ABD6-4882-8828-30D7B10C92DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8143F8A1-ABD6-4882-8828-30D7B10C92DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8143F8A1-ABD6-4882-8828-30D7B10C92DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
