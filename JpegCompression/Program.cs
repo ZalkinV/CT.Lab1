@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Archiver
+namespace JpegCompression
 {
     class Program
     {
@@ -79,11 +79,13 @@ namespace Archiver
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            //Encoder encoder = new Encoder(bytesFromFile);
-            //byte[] encodedBytes = encoder.Encode();
-            byte[] encodedBytes = new byte[0];
+
+            Encoder encoder = new Encoder(bytesFromFile);
+            byte[] encodedBytes = encoder.Encode();
+
             string newFilename = filename + ARCHIVE_EXTENSION;
             File.WriteAllBytes(newFilename, encodedBytes);
+            
             stopwatch.Stop();
 
             double compressionRate = 1 - (double)encodedBytes.Length / bytesFromFile.Length;
