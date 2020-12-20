@@ -9,12 +9,14 @@ namespace JpegCompression
     public class ArithmeticCoder
     {
         Dictionary<byte, int> Weights { get; set; }
+        int WeightsSum { get; set; }
         Dictionary<byte, Segment> Segments { get; set; }
 
         public ArithmeticCoder(HashSet<byte> alphabet)
         {
-            this.Segments = CreateSegments(alphabet);
             this.Weights = CreateWeights(alphabet);
+            this.WeightsSum = this.Weights.Sum(w => w.Value);
+            this.Segments = CreateSegments(alphabet);
         }
 
         private static Dictionary<byte, Segment> CreateSegments(HashSet<byte> alphabet)
@@ -46,7 +48,7 @@ namespace JpegCompression
         private void ResizeSegments()
         {
             double left = 0;
-            int weightsSum = this.Weights.Sum(w => w.Value);
+            int weightsSum = this.WeightsSum;
 
             foreach ((byte symbol, Segment segment) in this.Segments)
             {
@@ -65,6 +67,7 @@ namespace JpegCompression
             {
                 byte curByte = bytes[i];
                 this.Weights[curByte]++;
+                this.WeightsSum++;
                 double newLeft = left + (right - left) * this.Segments[curByte].Left;
                 double newRight = left + (right - left) * this.Segments[curByte].Right;
                 left = newLeft;
