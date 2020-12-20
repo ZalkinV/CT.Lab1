@@ -12,6 +12,7 @@ namespace JpegCompression
         public ArithmeticCoder(HashSet<byte> alphabet)
         {
             this.Segments = CreateSegments(alphabet);
+            this.SymbolsWeights = CreateSymbolsWeights(alphabet);
         }
 
         private static Dictionary<byte, Segment> CreateSegments(HashSet<byte> alphabet)
@@ -29,6 +30,15 @@ namespace JpegCompression
             }
 
             return segments;
+        }
+
+        private static Dictionary<byte, int> CreateSymbolsWeights(HashSet<byte> alphabet)
+        {
+            Dictionary<byte, int> weights = new Dictionary<byte, int>(alphabet.Count);
+            foreach (var symbol in alphabet)
+                weights[symbol] = 1;
+
+            return weights;
         }
     }
 }
