@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace JpegCompression
@@ -42,6 +43,20 @@ namespace JpegCompression
             return weights;
         }
 
+        private void ResizeSegments()
+        {
+            double left = 0;
+            int weightsSum = this.Weights.Sum(w => w.Value);
+
+            foreach ((byte symbol, Segment segment) in this.Segments)
+            {
+                double segmentLength = (double)this.Weights[symbol] / weightsSum;
+                segment.Left = left;
+                segment.Right = left + segmentLength;
+                left = segment.Right;
+            }
+        }
+
         public double Encode(IList<byte> bytes)
         {
             double left = 0;
@@ -54,7 +69,7 @@ namespace JpegCompression
                 double newRight = left + (right - left) * this.Segments[curByte].Right;
                 left = newLeft;
                 right = newRight;
-                //ResizeSegments
+                ResizeSegments();
             }
 
             double code = (left + right) / 2;
