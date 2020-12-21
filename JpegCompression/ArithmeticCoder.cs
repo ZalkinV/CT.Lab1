@@ -133,7 +133,7 @@ namespace JpegCompression
 
             for (int i = symbol + 1; i < this.CumulativeCounts.Count; i++)
             {
-                this.CumulativeCounts[i] = this.CumulativeCounts[i - 1] + this.CumulativeCounts[i - 1];
+                this.CumulativeCounts[i] = this.CumulativeCounts[i - 1] + this.SymbolsCounts[i - 1];
             }
         }
 
