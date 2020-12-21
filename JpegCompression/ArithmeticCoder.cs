@@ -17,13 +17,13 @@ namespace JpegCompression
         List<int> CumulativeCounts { get; set; }
         int TotalCount => this.CumulativeCounts.Last();
 
-        int Left { get; set; }
-        int Right { get; set; }
-        int Range => Right - Left;
+        uint Left { get; set; }
+        uint Right { get; set; }
+        uint Range => Right - Left + 1;
 
-        const int Half = int.MaxValue / 2;
-        const int Quarter = int.MaxValue / 4;
-        const int ThirdQuarter = 3 * Quarter;
+        const uint Half = uint.MaxValue / 2;
+        const uint Quarter = uint.MaxValue / 4;
+        const uint ThirdQuarter = 3 * Quarter;
 
         int RemainsBitsCount { get; set; }
 
@@ -137,16 +137,16 @@ namespace JpegCompression
             }
         }
 
-        private int GetLeftBorder(int symbol)
+        private uint GetLeftBorder(int symbol)
         {
-            int leftBorder = this.Left + (int)(this.Range * (long)this.CumulativeCounts[symbol] / this.TotalCount);
+            uint leftBorder = (uint)(this.Left + this.Range * (ulong)this.CumulativeCounts[symbol] / (ulong)this.TotalCount);
             
             return leftBorder;
         }
 
-        private int GetRightBorder(int symbol)
+        private uint GetRightBorder(int symbol)
         {
-            int rightBorder = this.Left + (int)(this.Range * (long)this.CumulativeCounts[symbol - 1] / this.TotalCount);
+            uint rightBorder = (uint)(this.Left + this.Range * (ulong)this.CumulativeCounts[symbol + 1] / (ulong)this.TotalCount - 1);
 
             return rightBorder;
         }
