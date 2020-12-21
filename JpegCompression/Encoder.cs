@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,9 +31,16 @@ namespace JpegCompression
         public byte[] Encode()
         {
             ArithmeticCoder arithmeticCoder = new ArithmeticCoder(this.Alphabet);
-            var result = new byte[0];
+            BitArray encodedBits = arithmeticCoder.Encode(this.Bytes);
 
-            return result;
+            int bytesCount = (int)Math.Ceiling((double)encodedBits.Count / 8);
+            byte[] forBits = new byte[bytesCount];
+            encodedBits.CopyTo(forBits, 0);
+
+            var result = new List<byte>(bytesCount);
+            result.AddRange(forBits);
+
+            return result.ToArray();
         }
     }
 }

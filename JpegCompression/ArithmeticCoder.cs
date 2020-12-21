@@ -41,7 +41,7 @@ namespace JpegCompression
             this.RemainsBitsCount = 0;
         }
 
-        public BitArray Encode(byte[] symbols)
+        public BitArray Encode(IList<byte> symbols)
         {
             List<bool> resultBits = new List<bool>();
             foreach (byte symbol in symbols)

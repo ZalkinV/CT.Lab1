@@ -84,7 +84,7 @@ namespace JpegCompression
             var encodedBytes = encoder.Encode();
 
             string newFilename = filename + ARCHIVE_EXTENSION;
-            //File.WriteAllBytes(newFilename, encodedBytes);
+            File.WriteAllBytes(newFilename, encodedBytes);
             
             stopwatch.Stop();
 
