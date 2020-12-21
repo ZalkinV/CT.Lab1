@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,25 @@ namespace JpegCompression
             this.Right = int.MaxValue;
 
             this.RemainsBitsCount = 0;
+        }
+
+        public BitArray Encode(byte[] symbols)
+        {
+            List<bool> resultBits = new List<bool>();
+            foreach (byte symbol in symbols)
+            {
+                List<bool> symbolBits = Encode(symbol);
+                resultBits.AddRange(symbolBits);
+
+                UpdateCount(symbol);
+            }
+
+            var eofBits = Encode(EOF);
+            resultBits.AddRange(eofBits);
+
+            BitArray result = new BitArray(resultBits.ToArray());
+
+            return result;
         }
 
         public List<bool> Encode(int symbol)
@@ -105,6 +125,16 @@ namespace JpegCompression
             cumulativeCounts.Add(cumulativeCount);
 
             return cumulativeCounts;
+        }
+
+        private void UpdateCount(int symbol)
+        {
+            this.SymbolsCounts[symbol]++;
+
+            for (int i = symbol + 1; i < this.CumulativeCounts.Count; i++)
+            {
+                this.CumulativeCounts[i] = this.CumulativeCounts[i - 1] + this.CumulativeCounts[i - 1];
+            }
         }
 
         private int GetLeftBorder(int symbol)
