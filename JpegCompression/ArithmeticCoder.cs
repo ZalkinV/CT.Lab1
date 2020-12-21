@@ -9,13 +9,18 @@ namespace JpegCompression
     //https://www.youtube.com/watch?v=9vhbKiwjJo8&list=PLE125425EC837021F&index=53
     public class ArithmeticCoder
     {
-        const uint RIGHT = uint.MaxValue;
-        const uint LEFT = uint.MinValue;
         const int EOF = 256;
 
         List<int> Alphabet { get; set; }
         List<int> SymbolsCounts { get; set; }
         List<int> CumulativeCounts { get; set; }
+        int TotalCount => this.CumulativeCounts.Last();
+
+        int Left { get; set; }
+        int Right { get; set; }
+        int Range => Right - Left;
+
+        List<bool> RemainsBits { get; set; }
 
         public ArithmeticCoder(HashSet<byte> alphabet)
         {
@@ -24,6 +29,11 @@ namespace JpegCompression
 
             this.SymbolsCounts = CalculateCounts(this.Alphabet);
             this.CumulativeCounts = CalculateCumulativeCounts(this.SymbolsCounts);
+
+            this.RemainsBits = new List<bool>();
+
+            Left = 0;
+            Right = int.MaxValue;
         }
 
         private static List<int> CalculateCounts(List<int> alphabet)
@@ -49,6 +59,20 @@ namespace JpegCompression
             cumulativeCounts.Add(cumulativeCount);
 
             return cumulativeCounts;
+        }
+
+        private int GetLeftBorder(int symbol)
+        {
+            int leftBorder = this.Left + (this.Range * this.CumulativeCounts[symbol] / this.TotalCount);
+            
+            return leftBorder;
+        }
+
+        private int GetRightBorder(int symbol)
+        {
+            int rightBorder = this.Left + (this.Range * this.CumulativeCounts[symbol - 1] / this.TotalCount);
+
+            return rightBorder;
         }
     }
 }
