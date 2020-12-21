@@ -20,7 +20,11 @@ namespace JpegCompression
         int Right { get; set; }
         int Range => Right - Left;
 
-        List<bool> RemainsBits { get; set; }
+        const int Half = int.MaxValue / 2;
+        const int Quarter = int.MaxValue / 4;
+        const int ThirdQuarter = 3 * Quarter;
+
+        int RemainsBitsCount { get; set; }
 
         public ArithmeticCoder(HashSet<byte> alphabet)
         {
@@ -30,10 +34,52 @@ namespace JpegCompression
             this.SymbolsCounts = CalculateCounts(this.Alphabet);
             this.CumulativeCounts = CalculateCumulativeCounts(this.SymbolsCounts);
 
-            this.RemainsBits = new List<bool>();
+            this.Left = 0;
+            this.Right = int.MaxValue;
 
-            Left = 0;
-            Right = int.MaxValue;
+            this.RemainsBitsCount = 0;
+        }
+
+        public List<bool> Encode(int symbol)
+        {
+            this.Left = GetLeftBorder(symbol);
+            this.Right = GetRightBorder(symbol);
+
+            List<bool> result = new List<bool>();
+            while (Half < this.Left|| this.Right < Half)
+            {
+                if (this.Right < Half) // E1
+                {
+                    AddBit(result, false);
+                    this.Left *= 2;
+                    this.Right *= 2;
+                }
+                else if (Half < this.Left) // E2
+                {
+                    AddBit(result, true);
+                    this.Left = 2 * (this.Left - Half);
+                    this.Right = 2 * (this.Right - Half);
+                }    
+            }
+
+            while (Quarter < this.Left && this.Right < ThirdQuarter) // E3
+            {
+                this.RemainsBitsCount++;
+                this.Left = 2 * (this.Left - Quarter);
+                this.Right = 2 * (this.Right - Quarter);
+            }
+
+            return result;
+        }
+
+        private void AddBit(List<bool>bits, bool bit)
+        {
+            bits.Add(bit);
+            while (this.RemainsBitsCount > 0)
+            {
+                bits.Add(!bit);
+                this.RemainsBitsCount--;
+            }
         }
 
         private static List<int> CalculateCounts(List<int> alphabet)
