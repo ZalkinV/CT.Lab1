@@ -5,79 +5,50 @@ using System.Text;
 
 namespace JpegCompression
 {
-    //https://neerc.ifmo.ru/wiki/index.php?title=%D0%90%D1%80%D0%B8%D1%84%D0%BC%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%D0%BA%D0%BE%D0%B4%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5
     //http://bertolami.com/index.php?engine=blog&content=posts&detail=arithmetic-coding
+    //https://www.youtube.com/watch?v=9vhbKiwjJo8&list=PLE125425EC837021F&index=53
     public class ArithmeticCoder
     {
-        Dictionary<byte, int> Weights { get; set; }
-        int WeightsSum { get; set; }
-        Dictionary<byte, Segment> Segments { get; set; }
+        const uint RIGHT = uint.MaxValue;
+        const uint LEFT = uint.MinValue;
+        const int EOF = 256;
+
+        List<int> Alphabet { get; set; }
+        List<int> SymbolsCounts { get; set; }
+        List<int> CumulativeCounts { get; set; }
 
         public ArithmeticCoder(HashSet<byte> alphabet)
         {
-            this.Weights = CreateWeights(alphabet);
-            this.WeightsSum = this.Weights.Sum(w => w.Value);
-            this.Segments = CreateSegments(alphabet);
+            this.Alphabet = alphabet.Select(a => (int)a).OrderBy(a => a).ToList();
+            this.Alphabet.Add(EOF);
+
+            this.SymbolsCounts = CalculateCounts(this.Alphabet);
+            this.CumulativeCounts = CalculateCumulativeCounts(this.SymbolsCounts);
         }
 
-        private static Dictionary<byte, Segment> CreateSegments(HashSet<byte> alphabet)
+        private static List<int> CalculateCounts(List<int> alphabet)
         {
-            double prob = 1.0 / alphabet.Count;
-            Segment prevSegment = new Segment(0, 0);
-
-            Dictionary<byte, Segment> segments = new Dictionary<byte, Segment>(alphabet.Count);
+            List<int> counts = new List<int>(alphabet.Count);
             foreach (var symbol in alphabet)
             {
-                double newRight = prevSegment.Right + prob;
-                Segment curSegment = new Segment(prevSegment.Right, newRight);
-                segments[symbol] = curSegment;
-                prevSegment = curSegment;
+                counts[symbol] = 1;
             }
 
-            return segments;
+            return counts;
         }
 
-        private static Dictionary<byte, int> CreateWeights(HashSet<byte> alphabet)
+        private static List<int> CalculateCumulativeCounts(List<int> symbolsCounts)
         {
-            Dictionary<byte, int> weights = new Dictionary<byte, int>(alphabet.Count);
-            foreach (var symbol in alphabet)
-                weights[symbol] = 1;
-
-            return weights;
-        }
-
-        private void ResizeSegments()
-        {
-            double left = 0;
-            int weightsSum = this.WeightsSum;
-
-            foreach ((byte symbol, Segment segment) in this.Segments)
+            List<int> cumulativeCounts = new List<int>(symbolsCounts.Count);
+            int cumulativeCount = 0;
+            foreach (var symbolCount in symbolsCounts)
             {
-                double segmentLength = (double)this.Weights[symbol] / weightsSum;
-                segment.Left = left;
-                segment.Right = left + segmentLength;
-                left = segment.Right;
+                cumulativeCounts.Add(cumulativeCount);
+                cumulativeCount += symbolCount;
             }
-        }
+            cumulativeCounts.Add(cumulativeCount);
 
-        public double Encode(IList<byte> bytes)
-        {
-            double left = 0;
-            double right = 1;
-            for (int i = 0; i < bytes.Count; i++)
-            {
-                byte curByte = bytes[i];
-                this.Weights[curByte]++;
-                this.WeightsSum++;
-                double newLeft = left + (right - left) * this.Segments[curByte].Left;
-                double newRight = left + (right - left) * this.Segments[curByte].Right;
-                left = newLeft;
-                right = newRight;
-                ResizeSegments();
-            }
-
-            double code = (left + right) / 2;
-            return code;
+            return cumulativeCounts;
         }
     }
 }

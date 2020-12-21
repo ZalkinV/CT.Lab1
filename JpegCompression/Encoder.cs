@@ -27,10 +27,10 @@ namespace JpegCompression
             return result;
         }
 
-        public double Encode()
+        public byte[] Encode()
         {
             ArithmeticCoder arithmeticCoder = new ArithmeticCoder(this.Alphabet);
-            double result = arithmeticCoder.Encode(this.Bytes);
+            var result = new byte[0];
 
             return result;
         }

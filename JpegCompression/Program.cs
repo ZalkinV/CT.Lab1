@@ -81,11 +81,10 @@ namespace JpegCompression
             stopwatch.Start();
 
             Encoder encoder = new Encoder(bytesFromFile);
-            double codeword = encoder.Encode();
-            var encodedBytes = BitConverter.GetBytes(codeword);
+            var encodedBytes = encoder.Encode();
 
             string newFilename = filename + ARCHIVE_EXTENSION;
-            File.WriteAllBytes(newFilename, encodedBytes);
+            //File.WriteAllBytes(newFilename, encodedBytes);
             
             stopwatch.Stop();
 
