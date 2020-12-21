@@ -139,14 +139,14 @@ namespace JpegCompression
 
         private int GetLeftBorder(int symbol)
         {
-            int leftBorder = this.Left + (this.Range * this.CumulativeCounts[symbol] / this.TotalCount);
+            int leftBorder = this.Left + (int)(this.Range * (long)this.CumulativeCounts[symbol] / this.TotalCount);
             
             return leftBorder;
         }
 
         private int GetRightBorder(int symbol)
         {
-            int rightBorder = this.Left + (this.Range * this.CumulativeCounts[symbol - 1] / this.TotalCount);
+            int rightBorder = this.Left + (int)(this.Range * (long)this.CumulativeCounts[symbol - 1] / this.TotalCount);
 
             return rightBorder;
         }
