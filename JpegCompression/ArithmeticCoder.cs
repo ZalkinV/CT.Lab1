@@ -107,7 +107,7 @@ namespace JpegCompression
             List<int> counts = new List<int>(alphabet.Count);
             foreach (var symbol in alphabet)
             {
-                counts[symbol] = 1;
+                counts.Add(1);
             }
 
             return counts;
