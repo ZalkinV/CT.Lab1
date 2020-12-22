@@ -84,7 +84,7 @@ namespace JpegCompression
         public List<bool> GetLastEncodingBits()
         {
             List<bool> bitsToWrite = new List<bool>();
-            
+
             var eofBits = Encode(EOF);
             bitsToWrite.AddRange(eofBits);
 
@@ -102,6 +102,83 @@ namespace JpegCompression
             AddBit(bitsToWrite, !bitToAdd);
 
             return bitsToWrite;
+        }
+
+        uint Code { get; set; }
+        int CurBit { get; set; }
+
+        public byte[] Decode(BitArray bits)
+        {
+            InitializeCodeWithTheFirst32Bits(bits);
+
+            List<byte> result = new List<byte>();
+            while (true)
+            {
+                int decodedSymbol = DecodeSymbol(bits);
+
+                if (decodedSymbol == EOF)
+                    break;
+
+                result.Add((byte)decodedSymbol);
+
+                UpdateCount(decodedSymbol);
+            }
+
+            return result.ToArray();
+        }
+
+        private int DecodeSymbol(BitArray bits)
+        {
+            this.Range = (ulong)(this.Right - this.Left) + 1;
+            
+            ulong symbolCodePos = (ulong)(this.Code - this.Left) + 1;
+            uint cumulativeCount = (uint)((symbolCodePos * (ulong)this.TotalCount - 1) / this.Range);
+            var symbol = this.CumulativeCounts.FindLastIndex(cc => cumulativeCount > cc);
+
+            this.Right = GetRightBorder(symbol);
+            this.Left = GetLeftBorder(symbol);
+
+            while (true)
+            {
+                if (SegmentHelper.IsInSameHalf(this.Left, this.Right))
+                {
+                    this.Left = SegmentHelper.E1E2Scale(this.Left, 0);
+                    this.Right = SegmentHelper.E1E2Scale(this.Right, 1);
+                }
+                else if (SegmentHelper.IsInSecondQuarter(this.Left) && SegmentHelper.IsInThirdQuarter(this.Right))
+                {
+                    this.Left = SegmentHelper.E3Scale(this.Left, 0);
+                    this.Right = SegmentHelper.E3Scale(this.Right, 1);
+
+                    this.Code ^= 0x40000000;
+                }
+                else break;
+
+                var nextBit = ReadNextBit(bits);
+                this.Code = (this.Code << 1) + nextBit;
+            }
+
+            return symbol;
+        }
+
+        private void InitializeCodeWithTheFirst32Bits(BitArray bits)
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                this.Code = (this.Code << 1) + ReadNextBit(bits);
+            }
+        }
+
+        private uint ReadNextBit(BitArray bits)
+        {
+            if (this.CurBit < bits.Count)
+            {
+                uint nextBit = (uint)(bits[this.CurBit] ? 1 : 0);
+                this.CurBit++;
+                return nextBit;
+            }
+
+            return 0;
         }
 
         private void AddBit(List<bool>bits, bool bit)
