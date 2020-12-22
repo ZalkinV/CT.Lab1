@@ -16,7 +16,7 @@ namespace JpegCompression
             this.Alphabet = CreateAlphabet();
         }
 
-        private static HashSet<byte> CreateAlphabet()
+        public static HashSet<byte> CreateAlphabet()
         {
             byte[] alphabet = new byte[256];
             for (int i = 0; i < alphabet.Length; i++)

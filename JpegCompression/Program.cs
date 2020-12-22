@@ -108,9 +108,8 @@ namespace JpegCompression
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            //Decoder decoder = new Decoder(bytesFromFile);
-            //byte[] decodedBytes = decoder.Decode();
-            byte[] decodedBytes = new byte[0];
+            Decoder decoder = new Decoder(bytesFromFile);
+            byte[] decodedBytes = decoder.Decode();
 
             string newFilename = filename.Remove(filename.LastIndexOf("."));
             File.WriteAllBytes(newFilename, decodedBytes);
