@@ -133,7 +133,7 @@ namespace JpegCompression
             
             ulong symbolCodePos = (ulong)(this.Code - this.Left) + 1;
             uint cumulativeCount = (uint)((symbolCodePos * (ulong)this.TotalCount - 1) / this.Range);
-            var symbol = this.CumulativeCounts.FindLastIndex(cc => cumulativeCount > cc);
+            var symbol = GetSymbolByCumulativeCount(cumulativeCount);
 
             this.Right = GetRightBorder(symbol);
             this.Left = GetLeftBorder(symbol);
@@ -159,6 +159,13 @@ namespace JpegCompression
             }
 
             return symbol;
+        }
+
+        private int GetSymbolByCumulativeCount(uint cumulativeCount)
+        {
+            int lastIndex = this.CumulativeCounts.FindLastIndex(cc => cumulativeCount >= cc);
+
+            return lastIndex;
         }
 
         private void InitializeCodeWithTheFirst32Bits(BitArray bits)
