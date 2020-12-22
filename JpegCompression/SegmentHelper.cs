@@ -33,6 +33,12 @@ namespace JpegCompression
             return result;
         }
 
+        public static bool IsInFirstQuarter(uint value)
+        {
+            bool result = value <= Quarter;
+            return result;
+        }
+
         public static bool IsInSecondQuarter(uint value)
         {
             bool result = value >= Quarter;
@@ -42,6 +48,12 @@ namespace JpegCompression
         public static bool IsInThirdQuarter(uint value)
         {
             bool result = value <= ThirdQuarter;
+            return result;
+        }
+
+        public static bool IsInForthQuarter(uint value)
+        {
+            bool result = value >= ThirdQuarter;
             return result;
         }
     }

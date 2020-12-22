@@ -48,8 +48,8 @@ namespace JpegCompression
                 UpdateCount(symbol);
             }
 
-            var eofBits = Encode(EOF);
-            resultBits.AddRange(eofBits);
+            var lastBits = GetLastEncodingBits();
+            resultBits.AddRange(lastBits);
 
             BitArray result = new BitArray(resultBits.ToArray());
 
@@ -78,6 +78,29 @@ namespace JpegCompression
             }
 
             return result;
+        }
+
+        public List<bool> GetLastEncodingBits()
+        {
+            List<bool> bitsToWrite = new List<bool>();
+            
+            var eofBits = Encode(EOF);
+            bitsToWrite.AddRange(eofBits);
+
+            bool bitToAdd = false;
+            if (SegmentHelper.IsInFirstQuarter(this.Left) && SegmentHelper.IsInThirdQuarter(this.Right))
+            {
+                bitToAdd = false;
+            }
+            else if (SegmentHelper.IsInSecondQuarter(this.Left) && SegmentHelper.IsInForthQuarter(this.Right))
+            {
+                bitToAdd = true;
+            }
+
+            AddBit(bitsToWrite, bitToAdd);
+            AddBit(bitsToWrite, !bitToAdd);
+
+            return bitsToWrite;
         }
 
         private void AddBit(List<bool>bits, bool bit)
