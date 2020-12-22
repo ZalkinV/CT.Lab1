@@ -19,7 +19,7 @@ namespace JpegCompression
 
         uint Left { get; set; }
         uint Right { get; set; }
-        ulong Range => (ulong)(Right - Left) + 1;
+        ulong Range { get; set; }
 
         int RemainsBitsCount { get; set; }
 
@@ -58,8 +58,9 @@ namespace JpegCompression
 
         public List<bool> Encode(int symbol)
         {
-            this.Left = GetLeftBorder(symbol);
+            this.Range = (ulong)(Right - Left) + 1;
             this.Right = GetRightBorder(symbol);
+            this.Left = GetLeftBorder(symbol);
 
             List<bool> result = new List<bool>();
             while (SegmentHelper.IsInSameHalf(this.Left, this.Right))
