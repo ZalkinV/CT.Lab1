@@ -19,11 +19,7 @@ namespace JpegCompression
 
         uint Left { get; set; }
         uint Right { get; set; }
-        uint Range => Right - Left + 1;
-
-        const uint Half = uint.MaxValue / 2;
-        const uint Quarter = uint.MaxValue / 4;
-        const uint ThirdQuarter = 3 * Quarter;
+        ulong Range => (ulong)(Right - Left) + 1;
 
         int RemainsBitsCount { get; set; }
 
@@ -36,7 +32,7 @@ namespace JpegCompression
             this.CumulativeCounts = CalculateCumulativeCounts(this.SymbolsCounts);
 
             this.Left = 0;
-            this.Right = int.MaxValue;
+            this.Right = uint.MaxValue;
 
             this.RemainsBitsCount = 0;
         }
@@ -66,27 +62,19 @@ namespace JpegCompression
             this.Right = GetRightBorder(symbol);
 
             List<bool> result = new List<bool>();
-            while (Half < this.Left|| this.Right < Half)
+            while (SegmentHelper.IsInSameHalf(this.Left, this.Right))
             {
-                if (this.Right < Half) // E1
-                {
-                    AddBit(result, false);
-                    this.Left *= 2;
-                    this.Right *= 2;
-                }
-                else if (Half < this.Left) // E2
-                {
-                    AddBit(result, true);
-                    this.Left = 2 * (this.Left - Half);
-                    this.Right = 2 * (this.Right - Half);
-                }    
-            }
+                var bit = this.Left >> 31 == 1 ? true : false;
+                AddBit(result, bit);
 
-            while (Quarter < this.Left && this.Right < ThirdQuarter) // E3
+                this.Left = SegmentHelper.E1E2Scale(this.Left, 0);
+                this.Right = SegmentHelper.E1E2Scale(this.Right, 1);
+            }
+            while (SegmentHelper.IsInSecondQuarter(this.Left) && SegmentHelper.IsInThirdQuarter(this.Right))
             {
+                this.Left = SegmentHelper.E3Scale(this.Left, 0);
+                this.Right = SegmentHelper.E3Scale(this.Right, 1);
                 this.RemainsBitsCount++;
-                this.Left = 2 * (this.Left - Quarter);
-                this.Right = 2 * (this.Right - Quarter);
             }
 
             return result;
