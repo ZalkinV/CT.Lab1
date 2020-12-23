@@ -40,7 +40,7 @@ namespace Archiver.Compression
                 {
                     result.Add(runLengthByte);
                 }
-                else if (byteCounter >= 5)
+                else if (byteCounter >= 257)
                 {
                     result.Add((byte)(byteCounter - 2));
                     byteCounter = 0;
