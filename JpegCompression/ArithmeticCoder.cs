@@ -81,7 +81,7 @@ namespace JpegCompression
             return result;
         }
 
-        public List<bool> GetLastEncodingBits()
+        private List<bool> GetLastEncodingBits()
         {
             List<bool> bitsToWrite = new List<bool>();
 
