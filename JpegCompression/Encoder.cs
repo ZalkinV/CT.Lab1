@@ -29,19 +29,18 @@ namespace JpegCompression
 
         public byte[] Encode()
         {
-            var bwtResult = BWT(this.Bytes);
-            var mtfResult = MTF(bwtResult.Bytes);
-            var rleResult = RLE(mtfResult);
-            var arcResult = ARC(rleResult);
+            BurrowsWheelerResult bwtResult = BWT(this.Bytes);
+            IList<byte> mtfResult = MTF(bwtResult.Bytes);
+            IList<byte> rleResult = RLE(mtfResult);
+            BitArray arcResult = ARC(rleResult);
 
-            int bytesCount = (int)Math.Ceiling((double)arcResult.Count / 8);
-            byte[] forBits = new byte[bytesCount];
-            arcResult.CopyTo(forBits, 0);
+            CompressedData compressedData = new CompressedData(
+                bwtInitialStringIndex: bwtResult.InitialStringIndex,
+                arcBits: arcResult);
 
-            var result = new List<byte>(bytesCount);
-            result.AddRange(forBits);
+            byte[] result = compressedData.ToByteArray();
 
-            return result.ToArray();
+            return result;
         }
 
         public static BurrowsWheelerResult BWT(IList<byte> bytes)

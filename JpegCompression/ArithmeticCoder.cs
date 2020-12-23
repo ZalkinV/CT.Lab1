@@ -107,7 +107,7 @@ namespace JpegCompression
         uint Code { get; set; }
         int CurBit { get; set; }
 
-        public byte[] Decode(BitArray bits)
+        public IList<byte> Decode(BitArray bits)
         {
             InitializeCodeWithTheFirst32Bits(bits);
 
@@ -124,7 +124,7 @@ namespace JpegCompression
                 UpdateCount(decodedSymbol);
             }
 
-            return result.ToArray();
+            return result;
         }
 
         private int DecodeSymbol(BitArray bits)
