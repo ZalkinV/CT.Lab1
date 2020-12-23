@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Archiver.Compression;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -7,13 +8,11 @@ namespace JpegCompression
 {
     public class Encoder
     {
-        private HashSet<byte> Alphabet { get; set; }
         public IList<byte> Bytes { get; }
 
         public Encoder(IList<byte> bytes)
         {
             this.Bytes = bytes;
-            this.Alphabet = CreateAlphabet();
         }
 
         public static HashSet<byte> CreateAlphabet()
@@ -30,17 +29,52 @@ namespace JpegCompression
 
         public byte[] Encode()
         {
-            ArithmeticCoder arithmeticCoder = new ArithmeticCoder(this.Alphabet);
-            BitArray encodedBits = arithmeticCoder.Encode(this.Bytes);
+            var bwtResult = BWT(this.Bytes);
+            var mtfResult = MTF(bwtResult.Bytes);
+            var rleResult = RLE(mtfResult);
+            var arcResult = ARC(rleResult);
 
-            int bytesCount = (int)Math.Ceiling((double)encodedBits.Count / 8);
+            int bytesCount = (int)Math.Ceiling((double)arcResult.Count / 8);
             byte[] forBits = new byte[bytesCount];
-            encodedBits.CopyTo(forBits, 0);
+            arcResult.CopyTo(forBits, 0);
 
             var result = new List<byte>(bytesCount);
             result.AddRange(forBits);
 
             return result.ToArray();
+        }
+
+        public static BurrowsWheelerResult BWT(IList<byte> bytes)
+        {
+            var bwt = new BurrowsWheelerTransform(bytes);
+            var bwtResult = bwt.DirectTransform();
+
+            return bwtResult;
+        }
+
+        public static IList<byte> MTF(IList<byte> bytes)
+        {
+            var mtf = new MoveToFront(bytes);
+            var mtfResult = mtf.Transform();
+
+            return mtfResult;
+        }
+
+        public static IList<byte> RLE(IList<byte> bytes)
+        {
+            var rle = new RunLengthEncoding(bytes);
+            var rleResult = rle.Encode();
+
+            return rleResult;
+        }
+
+        public static BitArray ARC(IList<byte> bytes)
+        {
+            var alphabet = CreateAlphabet();
+            var arc = new ArithmeticCoder(alphabet);
+            BitArray encodedBits = arc.Encode(bytes);
+
+            return encodedBits;
         }
     }
 }
