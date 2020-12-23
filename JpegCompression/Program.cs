@@ -14,9 +14,6 @@ namespace JpegCompression
         {
             try
             {
-#if DEBUG
-                args = new string[] { "e", "test.txt" };
-#endif
                 if (args.Length == 0)
                 {
                     args = new string[2];
